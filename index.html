@@ -31,7 +31,6 @@
 
     .agent { 
       position: absolute; 
-      /* FORCE START ON FLOOR */
       top: 75vh; left: 50vw;
       transition: left 2.5s ease-in-out, top 2.5s ease-in-out; 
       display: flex; align-items: center; justify-content: center; 
@@ -40,17 +39,18 @@
       z-index: 1000; 
     }
 
+    /* BUBBLE STYLE */
     #bubble { 
       background: radial-gradient(circle at 30% 30%, white, rgba(255,255,255,0.2) 20%, rgba(0,255,255,0.4) 60%, rgba(0,255,255,0.8));
       border: 1px solid white; box-shadow: inset -5px -5px 10px rgba(255,255,255,0.5), 0 0 15px cyan;
-      transition: left 1s linear, top 1s linear; 
+      transition: left 0.5s linear, top 0.5s linear; /* Faster transition to follow Caine */
     }
 
     @keyframes walkBob { 0%, 100% { margin-top: 0px; } 50% { margin-top: -15px; } }
     .walking { animation: walkBob 0.4s infinite; }
     
     @keyframes hoverFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-    .hovering-wrap { animation: hoverFloat 2s ease-in-out infinite; }
+    .hovering-wrap { animation: hoverFloat 2s ease-in-out infinite; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
     #chat-container { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 120px; background: rgba(0, 0, 0, 0.95); border: 3px solid #ffd700; padding: 10px; z-index: 9999; border-radius: 15px; overflow: hidden; pointer-events: none; }
     #messages { display: flex; flex-direction: column-reverse; color: #ffd700; font-size: 13px; }
@@ -65,15 +65,18 @@
     </div>
     <div id="floor"></div>
     <div id="stage">
-      <!-- POMNI REDEFINED WITH EXPLICIT BORDER RADIUS AND Z-INDEX -->
       <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff; border-radius: 5px; z-index: 2000;">POMNI</div>
       
+      <!-- CAINE HAS THE HOVERING WRAP -->
       <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff; border-radius: 5px;"><div class="hovering-wrap">CAINE</div></div>
+      
       <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff; border-radius: 5px;">JAX</div>
       <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff; border-radius: 5px;">Ragatha</div>
       <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000;">GANGLE</div>
       <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff; border-radius: 5px;">Zooble</div>
       <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000; border-radius: 5px;">Kinger</div>
+      
+      <!-- BUBBLE IS ROUND -->
       <div id="bubble" class="agent" style="width: 30px; height: 30px; border-radius: 50%; color: #000;">Bubble</div>
     </div>
   </div>
@@ -112,16 +115,16 @@
       const move = () => {
         if (!agent.el) return;
 
+        // FIXED BUBBLE LOGIC: It follows Caine's position
         if (agent.name === "Bubble") {
-          const nextX = cainePos.x - 40;
-          const nextY = cainePos.y - 10;
+          const nextX = cainePos.x - 50;
+          const nextY = cainePos.y - 15;
           agent.el.style.left = nextX + 'px';
           agent.el.style.top = nextY + 'px';
-          setTimeout(move, 150);
+          setTimeout(move, 150); 
           return;
         }
 
-        // Target the floor area specifically
         const nextX = 50 + Math.random() * (window.innerWidth - 100);
         const nextY = (window.innerHeight * 0.70) + Math.random() * (window.innerHeight * 0.20); 
         
@@ -143,7 +146,6 @@
       move();
     }
 
-    // ENSURE POMNI IS ON STAGE IMMEDIATELY
     window.onload = () => {
       cast.forEach(agent => {
         agent.el.style.left = (Math.random() * 80 + 10) + 'vw';
