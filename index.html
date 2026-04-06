@@ -7,24 +7,28 @@
       margin: 0; 
       overflow: hidden; 
       font-family: 'Courier New', monospace; 
-      perspective: 1000px; 
+      perspective: 1200px; 
       height: 100vh;
     }
     
-    /* FLOOR FIX: Positioned at the bottom with a proper origin */
+    /* TADC FLOOR: Checkered Yellow and Purple pattern */
     #floor { 
       position: absolute; 
-      width: 200%; 
-      height: 100vh; 
-      bottom: -10vh; 
-      left: -50%;
-      background-image: 
-        radial-gradient(circle, #222 1px, transparent 1px), 
-        linear-gradient(#111 2px, transparent 2px), 
-        linear-gradient(90deg, #111 2px, transparent 2px);
-      background-size: 80px 80px; 
-      transform: rotateX(70deg); 
-      transform-origin: bottom;
+      width: 400%; 
+      height: 200vh; 
+      bottom: -20vh; 
+      left: -150%;
+      background-color: #5d2b8a; /* Purple base */
+      background-image: conic-gradient(
+        #ffd700 90deg, 
+        transparent 90deg 180deg, 
+        #ffd700 180deg 270deg, 
+        transparent 270deg
+      );
+      background-size: 120px 120px;
+      transform: rotateX(75deg); 
+      transform-origin: bottom center;
+      box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
       z-index: 0; 
     }
 
@@ -38,26 +42,25 @@
       border-radius: 5px; 
       font-size: 10px; 
       text-align: center; 
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
       z-index: 10;
     }
 
-    /* CHAT FIX: High z-index and removed pointer-events none */
     #chat-container { 
       position: fixed; 
       bottom: 20px; 
       left: 20px; 
       right: 20px; 
       height: 120px; 
-      background: rgba(0,0,0,0.9); 
-      border: 2px solid #0f0; 
+      background: rgba(0, 0, 0, 0.9); 
+      border: 3px solid #ffd700; 
       padding: 10px; 
-      font-size: 12px; 
+      font-size: 14px; 
       z-index: 9999; 
-      color: #0f0; 
+      color: #ffd700; 
       overflow-y: hidden; 
-      border-radius: 10px; 
-      box-shadow: 0 0 15px rgba(0,255,0,0.5);
+      border-radius: 15px; 
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     }
     #messages { display: flex; flex-direction: column-reverse; }
   </style>
@@ -66,24 +69,24 @@
   <div id="floor"></div>
   
   <div id="stage">
-    <div id="caine" class="agent" style="width: 60px; height: 60px; background: red; box-shadow: 0 0 25px red; color: white;">CAINE</div>
+    <div id="caine" class="agent" style="width: 65px; height: 65px; background: #ff0000; border: 3px solid white; color: white;">CAINE</div>
     <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white;">JAX</div>
-    <div id="ragatha" class="agent" style="width: 45px; height: 45px; background: #b22222; border: 2px solid blue; color: white;">Ragatha</div>
-    <div id="gangle" class="agent" style="width: 30px; height: 30px; background: pink; border-radius: 50%; color: black;">Happy</div>
-    <div id="zooble" class="agent" style="width: 40px; height: 40px; background: #ff4500; border: 3px dashed yellow; color: white;">Zooble</div>
-    <div id="kinger" class="agent" style="width: 40px; height: 55px; background: #FFD700; border: 3px solid #8B4513; color: black;">Kinger</div>
-    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; color: black;">Bubble</div>
+    <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: white;">Ragatha</div>
+    <div id="gangle" class="agent" style="width: 35px; height: 35px; background: pink; border-radius: 50%; color: black;">Happy</div>
+    <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: white;">Zooble</div>
+    <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: black;">Kinger</div>
+    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: #00ffff; border-radius: 50%; border: 1px solid white; color: black;">Bubble</div>
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>System: Digital Circus initialized...</div></div>
+    <div id="messages"><div>[SYSTEM]: Tent loaded. Welcome to the Circus!</div></div>
   </div>
 
   <script>
     const cast = [
       { el: document.getElementById('caine'), name: "CAINE", color: "red", x: 100, y: 100 },
-      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", x: 200, y: 200 },
-      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#b22222", x: 300, y: 300 },
+      { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff", x: 200, y: 200 },
+      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d", x: 300, y: 300 },
       { el: document.getElementById('gangle'), name: "Gangle", color: "pink", x: 150, y: 150, mood: "Happy" },
       { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", x: 50, y: 50 },
       { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", x: 400, y: 400 },
@@ -93,32 +96,37 @@
     function log(n, m, c) {
       const chat = document.getElementById('messages');
       const line = document.createElement('div');
-      line.style.marginBottom = "2px";
-      line.innerHTML = `<span style="color:${c}">[${n}]</span>: ${m}`;
-      chat.appendChild(line); // Changed to appendChild because of flex-direction: column-reverse
-      if(chat.children.length > 6) chat.firstElementChild.remove();
+      line.innerHTML = `<span style="color:${c}; font-weight:bold;">[${n}]</span>: ${m}`;
+      chat.appendChild(line);
+      if(chat.children.length > 5) chat.firstElementChild.remove();
     }
 
     function aiBrain(agent) {
       const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 250) + 50;
+      const y = Math.random() * (window.innerHeight - 300) + 100;
       agent.x = x; agent.y = y;
 
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
       
-      const scale = 0.5 + (y / window.innerHeight);
+      const scale = 0.4 + (y / window.innerHeight);
       agent.el.style.transform = `scale(${scale})`;
       agent.el.style.zIndex = Math.floor(y);
 
+      // Random Interaction Chance
+      if (Math.random() > 0.8) {
+          const lines = ["Where is the exit?", "I'm losing my mind!", "Caine, let us out!", "Is anyone else hungry?"];
+          if (agent.name !== "CAINE") log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
+      }
+
       // JAX PRANK LOGIC
-      if (agent.name === "JAX" && Math.random() > 0.5) {
+      if (agent.name === "JAX") {
         const g = cast.find(a => a.name === "Gangle");
-        if (Math.hypot(x - g.x, y - g.y) < 150 && g.mood === "Happy") {
+        if (Math.hypot(x - g.x, y - g.y) < 120 && g.mood === "Happy") {
           g.mood = "Sad"; 
           g.el.style.background = "#555"; 
           g.el.innerHTML = "Sad";
-          log("JAX", "Oops, my hand slipped.", "#a020f0");
+          log("JAX", "Oops, my hand slipped.", "#d1a3ff");
         }
       }
 
