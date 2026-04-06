@@ -2,84 +2,46 @@
 <html>
 <head>
   <style>
-    html, body { 
-      height: 100%; 
-      width: 100%; 
-      margin: 0; 
-      padding: 0; 
-      overflow: hidden; 
-      background: #050505;
-    }
-
-    body { 
-      font-family: 'Courier New', monospace; 
-      perspective: 1200px; 
-    }
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: #050505; }
+    body { font-family: 'Courier New', monospace; perspective: 1200px; }
     
     #tent-wall {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60%; 
-      background: repeating-linear-gradient(
-        90deg,
-        #b22222,
-        #b22222 40px,
-        #eee 40px,
-        #eee 80px
-      );
-      border-bottom: 5px solid #ffd700;
-      z-index: -2;
+      position: absolute; top: 0; left: 0; width: 100%; height: 60%; 
+      background: repeating-linear-gradient(90deg, #b22222, #b22222 40px, #eee 40px, #eee 80px);
+      border-bottom: 5px solid #ffd700; z-index: -2;
     }
 
     #floor { 
-      position: absolute; 
-      width: 400%; 
-      height: 150vh; 
-      bottom: -10vh; 
-      left: -150%;
+      position: absolute; width: 400%; height: 150vh; bottom: -10vh; left: -150%;
       background-color: #5d2b8a; 
-      background-image: conic-gradient(
-        #ffd700 90deg, 
-        transparent 90deg 180deg, 
-        #ffd700 180deg 270deg, 
-        transparent 270deg
-      );
-      background-size: 100px 100px;
-      transform: rotateX(70deg); 
-      transform-origin: bottom center;
-      box-shadow: inset 0 0 150px rgba(0,0,0,1);
-      z-index: -1; 
+      background-image: conic-gradient(#ffd700 90deg, transparent 90deg 180deg, #ffd700 180deg 270deg, transparent 270deg);
+      background-size: 100px 100px; transform: rotateX(70deg); transform-origin: bottom center;
+      box-shadow: inset 0 0 150px rgba(0,0,0,1); z-index: -1; 
     }
 
     .agent { 
       position: absolute; 
-      transition: all 2.5s ease-in-out; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-weight: bold; 
-      border-radius: 5px; 
-      font-size: 10px; 
-      text-align: center; 
-      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+      /* WALKING FIX: Shorter transition time for snappier steps */
+      transition: left 2s ease-in-out, top 2s ease-in-out, transform 0.3s; 
+      display: flex; align-items: center; justify-content: center; 
+      font-weight: bold; border-radius: 5px; font-size: 10px; 
+      text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+      /* Ensure they rotate/scale from the bottom (their feet) */
+      transform-origin: bottom center;
     }
 
+    /* Step animation to simulate walking bob */
+    @keyframes walkBob {
+      0%, 100% { margin-top: 0px; }
+      50% { margin-top: -10px; }
+    }
+    .walking { animation: walkBob 0.5s infinite; }
+
     #chat-container { 
-      position: fixed; 
-      bottom: 15px; 
-      left: 15px; 
-      right: 15px; 
-      height: 110px; 
-      background: rgba(0, 0, 0, 0.95); 
-      border: 3px solid #ffd700; 
-      padding: 10px; 
-      font-size: 13px; 
-      z-index: 9999; 
-      color: #ffd700; 
-      overflow: hidden; 
-      border-radius: 15px;
+      position: fixed; bottom: 15px; left: 15px; right: 15px; height: 110px; 
+      background: rgba(0, 0, 0, 0.95); border: 3px solid #ffd700; 
+      padding: 10px; font-size: 13px; z-index: 9999; color: #ffd700; 
+      overflow: hidden; border-radius: 15px;
     }
     #messages { display: flex; flex-direction: column-reverse; }
   </style>
@@ -100,7 +62,7 @@
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>[SYSTEM]: Name tags updated. Gangle is here.</div></div>
+    <div id="messages"><div>[SYSTEM]: Walking protocols enabled. Gravity engaged.</div></div>
   </div>
 
   <script>
@@ -124,26 +86,39 @@
     }
 
     function aiBrain(agent) {
-      const x = 50 + Math.random() * (window.innerWidth - 150);
-      const y = (window.innerHeight * 0.4) + Math.random() * (window.innerHeight * 0.35); 
+      // Pick a destination
+      const nextX = 50 + Math.random() * (window.innerWidth - 150);
+      const nextY = (window.innerHeight * 0.5) + Math.random() * (window.innerHeight * 0.25); 
       
-      agent.x = x; agent.y = y;
-      agent.el.style.left = x + 'px';
-      agent.el.style.top = y + 'px';
-      
-      const scale = 0.5 + (y / window.innerHeight) * 0.6;
-      agent.el.style.transform = `scale(${scale})`;
-      agent.el.style.zIndex = Math.floor(y);
+      // Start "walking" animation
+      agent.el.classList.add('walking');
 
+      // Update position
+      agent.x = nextX; 
+      agent.y = nextY;
+      agent.el.style.left = nextX + 'px';
+      agent.el.style.top = nextY + 'px';
+      
+      // Depth scaling (smaller in back, larger in front)
+      const scale = 0.6 + ((nextY - (window.innerHeight * 0.5)) / (window.innerHeight * 0.25)) * 0.5;
+      agent.el.style.transform = `scale(${scale})`;
+      agent.el.style.zIndex = Math.floor(nextY);
+
+      // Stop walking animation after the transition (2 seconds)
+      setTimeout(() => {
+        agent.el.classList.remove('walking');
+      }, 2000);
+
+      // Random Chat / Logic
       if (Math.random() > 0.9) {
-          const lines = ["I can't find the exit!", "Everything is perfectly normal.", "Where's my comedy mask?", "Hahaha!"];
+          const lines = ["My legs feel digital.", "Keep walking...", "Are we there yet?", "I think I saw a door!"];
           log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
       }
 
       // JAX PRANK LOGIC
       if (agent.name === "JAX") {
         const g = cast.find(a => a.name === "Gangle");
-        if (Math.hypot(x - g.x, y - g.y) < 100 && g.mood === "Happy") {
+        if (Math.hypot(agent.x - g.x, agent.y - g.y) < 100 && g.mood === "Happy") {
           g.mood = "Sad"; 
           g.el.style.background = "#555"; 
           g.el.innerHTML = "GANGLE :(";
@@ -151,18 +126,19 @@
         }
       }
 
-      // CAINE ADMIN LOGIC
+      // CAINE ADMIN LOGIC (Caine can still "fly" a bit more if you want, but here he walks)
       if (agent.name === "CAINE") {
         const g = cast.find(a => a.name === "Gangle");
         if (g.mood === "Sad") {
           g.mood = "Happy"; 
           g.el.style.background = "pink"; 
           g.el.innerHTML = "GANGLE";
-          log("CAINE", "NO SADNESS IN THE CIRCUS!", "red");
+          log("CAINE", "NO SADNESS!", "red");
         }
       }
 
-      setTimeout(() => aiBrain(agent), 2000 + Math.random() * 3000);
+      // Time until next "walk"
+      setTimeout(() => aiBrain(agent), 3000 + Math.random() * 4000);
     }
 
     cast.forEach(aiBrain);
