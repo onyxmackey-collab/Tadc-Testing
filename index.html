@@ -1,24 +1,35 @@
 <!DOCTYPE html>
 <html>
-<body id="world" style="background: #111; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; color: white; transition: background 3s;">
-
-  <!-- THE CIRCUS CAST (With added 3D Scale) -->
-  <div id="caine" style="width: 60px; height: 60px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 1000; transition: all 1s;">CAINE</div>
-  <div id="bubble" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; position: absolute; z-index: 500; transition: all 2s;"></div>
-  <div id="jax" style="width: 40px; height: 40px; background: #a020f0; position: absolute; z-index: 600; transition: all 1.5s;">JAX</div>
-  <div id="kinger" style="width: 35px; height: 50px; background: white; border: 3px solid purple; position: absolute; z-index: 400; transition: all 0.5s;">!</div>
-
-  <div id="chat" style="position: fixed; bottom: 10px; left: 10px; right: 10px; height: 80px; background: rgba(0,0,0,0.9); border: 1px solid #444; padding: 10px; font-size: 10px; z-index: 2000; color: #0f0; overflow: hidden;">
-    <div id="messages">System: Dimension & Sleep Cycles Loaded...</div>
+<head>
+  <style>
+    body { background: #000; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; perspective: 1200px; }
+    /* THE 3D FLOOR */
+    #floor { 
+      position: absolute; width: 200%; height: 200%; top: 45%; left: -50%;
+      background-image: radial-gradient(circle, #444 1px, transparent 1px), linear-gradient(#111 2px, transparent 2px), linear-gradient(90deg, #111 2px, transparent 2px);
+      background-size: 80px 80px; transform: rotateX(70deg); z-index: 1; opacity: 0.6;
+    }
+    #stage { position: relative; width: 100vw; height: 100vh; z-index: 10; transform-style: preserve-3d; }
+    .agent { position: absolute; transition: all 1.8s ease-in-out; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 8px; }
+    #chat { position: fixed; bottom: 10px; left: 10px; right: 10px; height: 90px; background: rgba(0,0,0,0.95); border: 1px solid #555; padding: 10px; font-size: 11px; z-index: 2000; color: #0f0; overflow: hidden; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div id="floor"></div>
+  <div id="stage">
+    <div id="caine" class="agent" style="width: 65px; height: 65px; background: red; box-shadow: 0 0 25px red; color: white; z-index: 1000;">CAINE</div>
+    <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white; z-index: 900;">JAX</div>
+    <div id="gangle" class="agent" style="width: 35px; height: 35px; background: pink; border-radius: 50%; color: black; font-size: 10px; z-index: 800;">Happy</div>
+    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; color: black; font-size: 8px; z-index: 700;">Bubble</div>
   </div>
+  <div id="chat"><div id="messages">System: 3D Room, Jax, and Gangle Masks Active...</div></div>
 
   <script>
-    let isBedtime = false;
     const cast = [
-      { el: document.getElementById('caine'), name: "CAINE", color: "red", power: 100 },
-      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", power: 1 },
-      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", power: 50 },
-      { el: document.getElementById('kinger'), name: "Kinger", color: "white", power: 30 }
+      { el: document.getElementById('caine'), name: "CAINE", color: "red", mood: "Master" },
+      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", mood: "Pranking" },
+      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", mood: "Happy" },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", mood: "Neutral" }
     ];
 
     function log(name, msg, color) {
@@ -27,44 +38,57 @@
       document.getElementById('messages').prepend(line);
     }
 
-    // BEDTIME CYCLE
-    setInterval(() => {
-      isBedtime = !isBedtime;
-      document.getElementById('world').style.background = isBedtime ? "#000022" : "#111";
-      log("SYSTEM", isBedtime ? "CAINE: BEDTIME, EVERYONE!" : "CAINE: WAKE UP!", "red");
-    }, 15000);
-
     function aiBrain(agent) {
-      if (isBedtime && agent.name !== "CAINE") {
-        setTimeout(() => aiBrain(agent), 2000);
-        return; 
-      }
-
-      // DIMENSION: Randomly pick a "depth" (Z)
-      const depth = Math.random(); // 0 is far away, 1 is close
-      const scale = 0.5 + (depth * 1.5); // Shrink to 50% or grow to 150%
+      const x = Math.random() * (window.innerWidth - 70);
+      const y = Math.random() * (window.innerHeight - 250);
       
-      const x = Math.random() * (window.innerWidth - 60);
-      const y = Math.random() * (window.innerHeight - 200);
-
-      agent.el.style.transform = `scale(${scale})`;
-      agent.el.style.zIndex = Math.floor(depth * 1000);
+      agent.x = x; agent.y = y;
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
-      agent.el.style.opacity = 0.3 + (depth * 0.7); // Faded when far away
+      
+      // 3D Perspective Scaling
+      const scale = 0.4 + (y / window.innerHeight) * 1.2;
+      agent.el.style.transform = `scale(${scale})`;
 
-      // Building with dimension
-      if (Math.random() > 0.6) {
+      // JAX PRANK LOGIC
+      if (agent.name === "JAX") {
+        const gangle = cast[2];
+        const distToGangle = Math.hypot(x - gangle.x, y - gangle.y);
+        if (distToGangle < 80 && gangle.mood === "Happy") {
+          gangle.mood = "Sad";
+          gangle.el.style.background = "#444";
+          gangle.el.style.color = "white";
+          gangle.el.innerHTML = "Sad";
+          log("JAX", "Whoops! Dropped your mask, Gangle!", "#a020f0");
+          log("Gangle", "My comedy mask... it's gone...", "gray");
+        }
+      }
+
+      // CAINE ADMIN LOGIC (Fixing Gangle)
+      if (agent.name === "CAINE") {
+        const gangle = cast[2];
+        const distToGangle = Math.hypot(x - gangle.x, y - gangle.y);
+        if (distToGangle < 100 && gangle.mood === "Sad") {
+          gangle.mood = "Happy";
+          gangle.el.style.background = "pink";
+          gangle.el.style.color = "black";
+          gangle.el.innerHTML = "Happy";
+          log("CAINE", "NO SADNESS IN THE CIRCUS! FIXED IT!", "red");
+        }
+      }
+
+      // BUILDING
+      if (agent.mood !== "Sad" && Math.random() > 0.4) {
         const b = document.createElement('div');
-        b.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:${10*scale}px; height:${10*scale}px; background:${agent.color}; z-index:${Math.floor(depth*900)}; opacity:0.4;`;
-        document.body.appendChild(b);
+        b.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:12px; height:12px; background:${agent.el.style.background}; opacity:0.3; z-index:5; border-radius:2px;`;
+        document.getElementById('stage').appendChild(b);
         setTimeout(() => b.remove(), 10000);
       }
 
-      setTimeout(() => aiBrain(agent), 1500 + Math.random() * 3000);
+      setTimeout(() => aiBrain(agent), 1500 + Math.random() * 2000);
     }
 
-    cast.forEach(agent => aiBrain(agent));
+    cast.forEach(aiBrain);
   </script>
 </body>
 </html>
