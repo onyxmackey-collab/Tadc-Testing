@@ -25,14 +25,17 @@
     .giant-star { position: absolute; top: 100px; right: 15%; width: 85px; height: 85px; background: #ff0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); border: 5px solid #000; z-index: 11;}
     .sky-portal { position: absolute; width: 130px; height: 130px; background: radial-gradient(circle, #fff, #87ceeb); border-radius: 50%; top: 35px; left: 8%; border: 8px solid #4a148c; z-index: 11;}
 
-    /* THE SEAMLESS FLOOR */
+    /* FLOOR RESIZED: Width reduced from 400% to 150% for a tighter fit */
     #floor { 
-      position: absolute; width: 400%; height: 120%; top: 40%; left: -150%;
+      position: absolute; 
+      width: 150%; 
+      height: 100%; 
+      top: 59%; /* Perfectly flush with the 60% wall height */
+      left: -25%;
       background-color: #fff;
       background-image: conic-gradient(#000 90deg, transparent 90deg 180deg, #000 180deg 270deg, transparent 270deg);
-      background-size: 100px 100px;
-      /* Fixed the 3D perspective to touch the bottom of the wall */
-      transform: perspective(600px) rotateX(65deg);
+      background-size: 80px 80px; /* Smaller tiles for smaller floor */
+      transform: perspective(800px) rotateX(70deg);
       transform-origin: top center;
       z-index: 1;
     }
@@ -106,7 +109,8 @@
 
     function aiBrain(agent) {
       const nextX = 50 + Math.random() * (window.innerWidth - 150);
-      const nextY = (window.innerHeight * 0.6) + Math.random() * (window.innerHeight * 0.3); 
+      // Constrained Y to stay on the smaller floor area
+      const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.25); 
       
       if(agent.name !== "CAINE") agent.el.classList.add('walking');
       agent.el.style.left = nextX + 'px';
