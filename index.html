@@ -11,9 +11,10 @@
       border-bottom: 10px solid #000; z-index: 10; overflow: hidden;
     }
 
-    /* DECORATIONS */
     .center-pole { position: absolute; left: 50%; top: 0; width: 12px; height: 100%; background: #222; transform: translateX(-50%); }
     .spiral { position: absolute; left: 50%; width: 50px; height: 100%; background: repeating-linear-gradient(transparent, transparent 20px, #f00 20px, #f00 40px); transform: translateX(-50%) skewY(-15deg); opacity: 0.7; }
+    
+    /* DECORATIONS */
     .deco-hoop { position: absolute; border: 15px solid #0f0; border-radius: 50%; z-index: 11; }
     .huge-hoop-left { left: 5%; top: 38%; width: 180px; height: 180px; border-width: 22px; }
     .mid-hoop-right { right: 18%; top: 22%; width: 70px; height: 70px; border-width: 12px; }
@@ -22,15 +23,12 @@
     .giant-star { position: absolute; top: 100px; right: 15%; width: 85px; height: 85px; background: #ff0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); border: 5px solid #000; z-index: 11;}
     .sky-portal { position: absolute; width: 130px; height: 130px; background: radial-gradient(circle, #fff, #87ceeb); border-radius: 50%; top: 35px; left: 8%; border: 8px solid #4a148c; z-index: 11;}
 
-    /* THE PILLOW FORT */
-    #fort {
-      position: absolute; right: 10%; top: 62%; width: 150px; height: 100px;
-      z-index: 15; pointer-events: none;
-    }
-    .pillow {
-      position: absolute; background: #eee; border: 3px solid #ccc; border-radius: 10px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-    }
+    /* PROPS */
+    #fort { position: absolute; right: 10%; top: 62%; width: 150px; height: 100px; z-index: 15; pointer-events: none; }
+    .pillow { position: absolute; background: #eee; border: 3px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+    
+    #zooble-box { position: absolute; left: 5%; bottom: 15%; width: 80px; height: 50px; background: #8B4513; border: 4px solid #4A2500; z-index: 15; box-shadow: 0 5px 10px rgba(0,0,0,0.5); }
+    #zooble-box::after { content: '📦零件'; position: absolute; top: -20px; left: 5px; color: #fff; font-size: 10px; font-weight: bold; }
 
     #floor { 
       position: absolute; width: 150%; height: 100%; top: 59%; left: -25%;
@@ -39,12 +37,13 @@
       background-size: 80px 80px; transform: perspective(800px) rotateX(70deg); transform-origin: top center; z-index: 5;
     }
 
+    /* AGENTS */
     .agent { 
       position: absolute; transition: left 2.5s ease-in-out, top 2.5s ease-in-out; 
       display: flex; align-items: center; justify-content: center; 
       font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
       box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center; 
-      z-index: 1000;
+      z-index: 1000; /* FORCE ABOVE EVERYTHING */
     }
 
     #bubble { 
@@ -71,12 +70,13 @@
       <div class="giant-star"></div>
     </div>
 
-    <!-- KINGER'S FORT -->
     <div id="fort">
       <div class="pillow" style="width: 60px; height: 40px; bottom: 0; left: 0; background: #fff;"></div>
       <div class="pillow" style="width: 60px; height: 40px; bottom: 0; left: 70px; background: #ddd;"></div>
       <div class="pillow" style="width: 80px; height: 45px; bottom: 35px; left: 30px; background: #eee;"></div>
     </div>
+    
+    <div id="zooble-box"></div>
 
     <div id="floor"></div>
     <div id="stage">
@@ -94,14 +94,14 @@
 
   <script>
     const cast = [
-      { el: document.getElementById('pomni'), name: "POMNI", color: "#ff4d4d", lines: ["Is there an exit?", "I don't belong here!"] },
-      { el: document.getElementById('caine'), name: "CAINE", color: "red", lines: ["WELCOME!", "ADVENTURE AWAITS!"] },
-      { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff", lines: ["Whatever, dollface.", "I'm bored."] },
-      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d", lines: ["Stay calm!", "Everything is fine."] },
-      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", lines: ["My mask...", "I'm sad."] },
-      { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", lines: ["Leave me alone.", "I hate this."] },
-      { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", lines: ["INSECTS?!", "MY FORTRESS IS IMPENETRABLE!"] },
-      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", lines: ["YUM SOAP!", "POP!"] }
+      { el: document.getElementById('pomni'), name: "POMNI", color: "#ff4d4d", lines: ["Is there an exit?", "I need to get out!"] },
+      { el: document.getElementById('caine'), name: "CAINE", color: "red", lines: ["WELCOME!", "WHAT A MARVELOUS DAY!"] },
+      { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff", lines: ["Hope you're ready for drama.", "Heh."] },
+      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d", lines: ["Just keep smiling!", "We're okay!"] },
+      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", lines: ["*sigh*", "Why did I wake up?"] },
+      { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", lines: ["Don't talk to me.", "Ugh."] },
+      { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", lines: ["IS IT SAFE?!", "I'M IN MY FORT!"] },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", lines: ["YUM SOAP!", "CAINE!"] }
     ];
 
     function log(n, m, c) {
@@ -130,26 +130,14 @@
         return;
       }
 
-      let nextX, nextY;
-      
-      if (agent.name === "Kinger") {
-        // Kinger stays near his fort (bottom right) 80% of the time
-        if (Math.random() > 0.2) {
-          nextX = window.innerWidth * 0.7 + Math.random() * 100;
-          nextY = window.innerHeight * 0.7 + Math.random() * 50;
-        } else {
-          nextX = 100 + Math.random() * (window.innerWidth - 200);
-          nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.20);
-        }
-      } else {
-        nextX = 100 + Math.random() * (window.innerWidth - 200);
-        nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.20);
-      }
+      // SAFE BOUNDARY: Stricter Y limit (min 0.65, max 0.85) to prevent disappearing
+      const nextX = 100 + Math.random() * (window.innerWidth - 200);
+      const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.20); 
       
       if (agent.name === "CAINE") {
         cainePos = { x: nextX, y: nextY };
-      } else {
-        agent.el.classList.add('walking');
+      } else if (agent.name !== "Kinger") {
+         agent.el.classList.add('walking');
       }
 
       const scale = 0.7 + ((nextY / window.innerHeight) * 0.3);
