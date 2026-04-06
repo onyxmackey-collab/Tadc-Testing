@@ -2,7 +2,7 @@
 <html>
 <head>
   <style>
-    html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; }
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; font-family: sans-serif; }
     #circus-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
 
     #tent-wall {
@@ -18,7 +18,7 @@
     .huge-hoop-left { left: 5%; top: 38%; width: 180px; height: 180px; border-width: 22px; }
     .mid-hoop-right { right: 18%; top: 22%; width: 70px; height: 70px; border-width: 12px; }
     .small-hoop-right { right: 10%; top: 50%; width: 50px; height: 50px; border-width: 10px; }
-    .zipper-halo { left: 50%; top: 30%; width: 120px; height: 35px; border-width: 10px; transform: translateX(-50) rotateX(75deg); }
+    .zipper-halo { left: 50%; top: 30%; width: 120px; height: 35px; border-width: 10px; transform: translateX(-50%) rotateX(75deg); }
     .giant-star { position: absolute; top: 100px; right: 15%; width: 85px; height: 85px; background: #ff0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); border: 5px solid #000; z-index: 11;}
     .sky-portal { position: absolute; width: 130px; height: 130px; background: radial-gradient(circle, #fff, #87ceeb); border-radius: 50%; top: 35px; left: 8%; border: 8px solid #4a148c; z-index: 11;}
 
@@ -31,8 +31,6 @@
 
     .agent { 
       position: absolute; 
-      /* FIX: Start them on the floor immediately */
-      top: 75%; left: 50%;
       transition: left 2.5s ease-in-out, top 2.5s ease-in-out; 
       display: flex; align-items: center; justify-content: center; 
       font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
@@ -65,32 +63,35 @@
     </div>
     <div id="floor"></div>
     <div id="stage">
-      <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff;">POMNI</div>
-      <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff;"><div class="hovering-wrap">CAINE</div></div>
-      <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff;">JAX</div>
-      <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff;">Ragatha</div>
-      <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000;">GANGLE</div>
-      <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff;">Zooble</div>
-      <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000;">Kinger</div>
-      <div id="bubble" class="agent" style="width: 30px; height: 30px; border-radius: 50%; color: #000;">Bubble</div>
+      <!-- POMNI ADDED BACK WITH EXPLICIT STARTING POSITION -->
+      <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff; left: 20%; top: 75%;">POMNI</div>
+      
+      <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff; left: 50%; top: 70%;"><div class="hovering-wrap">CAINE</div></div>
+      <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff; left: 80%; top: 80%;">JAX</div>
+      <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff; left: 40%; top: 85%;">Ragatha</div>
+      <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000; left: 60%; top: 75%;">GANGLE</div>
+      <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff; left: 10%; top: 80%;">Zooble</div>
+      <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000; left: 70%; top: 85%;">Kinger</div>
+      <div id="bubble" class="agent" style="width: 30px; height: 30px; border-radius: 50%; color: #000; left: 45%; top: 65%;">Bubble</div>
     </div>
   </div>
   <div id="chat-container"><div id="messages"></div></div>
 
   <script>
     const cast = [
-      { el: document.getElementById('pomni'), name: "POMNI", color: "#ff4d4d", lines: ["Is there an exit?", "I don't belong here!"] },
-      { el: document.getElementById('caine'), name: "CAINE", color: "red", lines: ["WELCOME!", "ADVENTURE AWAITS!"] },
-      { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff", lines: ["Whatever, dollface.", "I'm bored."] },
-      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d", lines: ["Stay calm!", "Everything is fine."] },
-      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", lines: ["My mask...", "I'm sad."] },
-      { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", lines: ["Leave me alone.", "I hate this."] },
-      { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", lines: ["INSECTS?!", "AH! A STRANGER!"] },
-      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", lines: ["YUM SOAP!", "POP!"] }
+      { el: document.getElementById('pomni'), name: "POMNI", color: "#ff4d4d", lines: ["Is there an exit?", "I don't belong here!", "Everything is screaming!"] },
+      { el: document.getElementById('caine'), name: "CAINE", color: "red", lines: ["WELCOME!", "ADVENTURE AWAITS!", "DON'T LOOK AT THE VOID!"] },
+      { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff", lines: ["Whatever, dollface.", "I'm bored.", "Did someone say 'misery'?"] },
+      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d", lines: ["Stay calm!", "Everything is fine.", "We're all okay here!"] },
+      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", lines: ["My mask...", "I'm sad.", "It broke again..."] },
+      { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", lines: ["Leave me alone.", "I hate this.", "Don't touch my parts."] },
+      { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", lines: ["INSECTS?!", "AH! A STRANGER!", "WHERE AM I?"] },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", lines: ["YUM SOAP!", "POP!", "WASH YOUR HANDS!"] }
     ];
 
     function log(n, m, c) {
       const msgs = document.getElementById('messages');
+      if(!msgs) return;
       const line = document.createElement('div');
       line.innerHTML = `<span style="color:${c}; font-weight:bold;">[${n}]</span>: ${m}`;
       msgs.prepend(line);
@@ -100,23 +101,25 @@
     function socialEngine() {
       const char = cast[Math.floor(Math.random() * cast.length)];
       log(char.name, char.lines[Math.floor(Math.random() * char.lines.length)], char.color);
-      setTimeout(socialEngine, 5000 + Math.random() * 5000);
+      setTimeout(socialEngine, 4000 + Math.random() * 4000);
     }
 
-    let cainePos = { x: window.innerWidth / 2, y: window.innerHeight * 0.75 };
+    let cainePos = { x: window.innerWidth / 2, y: window.innerHeight * 0.7 };
 
     function aiBrain(agent) {
-      const moveAgent = () => {
+      const move = () => {
+        if (!agent.el) return;
+
         if (agent.name === "Bubble") {
-          const nextX = cainePos.x - 50;
-          const nextY = cainePos.y - 15;
+          const nextX = cainePos.x - 40;
+          const nextY = cainePos.y - 10;
           agent.el.style.left = nextX + 'px';
           agent.el.style.top = nextY + 'px';
-          setTimeout(moveAgent, 100);
+          setTimeout(move, 150);
           return;
         }
 
-        // STRICTER BOUNDS: Stays within the lower checkered area
+        // Target the floor specifically (65% to 90% height)
         const nextX = 50 + Math.random() * (window.innerWidth - 100);
         const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.25); 
         
@@ -126,20 +129,24 @@
           agent.el.classList.add('walking');
         }
 
+        // Perspective scaling
         const scale = 0.7 + ((nextY / window.innerHeight) * 0.3);
         agent.el.style.transform = `scale(${scale})`;
         agent.el.style.left = nextX + 'px';
         agent.el.style.top = nextY + 'px';
 
         setTimeout(() => { agent.el.classList.remove('walking'); }, 2500);
-        setTimeout(moveAgent, 4000 + Math.random() * 3000);
+        setTimeout(move, 5000 + Math.random() * 4000);
       };
 
-      moveAgent(); // Call immediately so they snap to a floor position on load
+      move();
     }
 
-    cast.forEach(aiBrain);
-    socialEngine();
+    // Start everything
+    window.onload = () => {
+      cast.forEach(aiBrain);
+      socialEngine();
+    };
   </script>
 </body>
 </html>
