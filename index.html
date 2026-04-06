@@ -11,14 +11,13 @@
       height: 100vh;
     }
     
-    /* TADC FLOOR: Checkered Yellow and Purple pattern */
     #floor { 
       position: absolute; 
       width: 400%; 
       height: 200vh; 
       bottom: -20vh; 
       left: -150%;
-      background-color: #5d2b8a; /* Purple base */
+      background-color: #5d2b8a; 
       background-image: conic-gradient(
         #ffd700 90deg, 
         transparent 90deg 180deg, 
@@ -69,6 +68,7 @@
   <div id="floor"></div>
   
   <div id="stage">
+    <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff0000 50%, #0000ff 50%); color: white; border: 2px solid white;">POMNI</div>
     <div id="caine" class="agent" style="width: 65px; height: 65px; background: #ff0000; border: 3px solid white; color: white;">CAINE</div>
     <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white;">JAX</div>
     <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: white;">Ragatha</div>
@@ -79,11 +79,12 @@
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>[SYSTEM]: Tent loaded. Welcome to the Circus!</div></div>
+    <div id="messages"><div>[SYSTEM]: Pomni has joined the circus. Everything is fine.</div></div>
   </div>
 
   <script>
     const cast = [
+      { el: document.getElementById('pomni'), name: "POMNI", color: "#ff4d4d", x: 150, y: 150 },
       { el: document.getElementById('caine'), name: "CAINE", color: "red", x: 100, y: 100 },
       { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff", x: 200, y: 200 },
       { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d", x: 300, y: 300 },
@@ -102,31 +103,37 @@
     }
 
     function aiBrain(agent) {
-      const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 300) + 100;
+      // SCREEN BOUNDARY FIX: Keep them within the viewport
+      const x = Math.random() * (window.innerWidth - 80);
+      const y = Math.random() * (window.innerHeight - 250) + 100; // Stay off the chat and the very top
+      
       agent.x = x; agent.y = y;
-
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
       
-      const scale = 0.4 + (y / window.innerHeight);
+      const scale = 0.5 + (y / window.innerHeight) * 0.5;
       agent.el.style.transform = `scale(${scale})`;
       agent.el.style.zIndex = Math.floor(y);
 
-      // Random Interaction Chance
-      if (Math.random() > 0.8) {
-          const lines = ["Where is the exit?", "I'm losing my mind!", "Caine, let us out!", "Is anyone else hungry?"];
-          if (agent.name !== "CAINE") log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
+      // Pomni unique line
+      if (agent.name === "POMNI" && Math.random() > 0.9) {
+          log("POMNI", "...is this a dream?", "white");
+      }
+
+      // Interaction check
+      if (Math.random() > 0.85 && agent.name !== "CAINE") {
+          const lines = ["I want to go home.", "Who am I?", "This floor is colorful.", "Is it dinner time?"];
+          log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
       }
 
       // JAX PRANK LOGIC
       if (agent.name === "JAX") {
         const g = cast.find(a => a.name === "Gangle");
-        if (Math.hypot(x - g.x, y - g.y) < 120 && g.mood === "Happy") {
+        if (Math.hypot(x - g.x, y - g.y) < 100 && g.mood === "Happy") {
           g.mood = "Sad"; 
           g.el.style.background = "#555"; 
           g.el.innerHTML = "Sad";
-          log("JAX", "Oops, my hand slipped.", "#d1a3ff");
+          log("JAX", "Oops, my mask slipped.", "#d1a3ff");
         }
       }
 
@@ -137,7 +144,7 @@
           g.mood = "Happy"; 
           g.el.style.background = "pink"; 
           g.el.innerHTML = "Happy";
-          log("CAINE", "NO SADNESS IN MY CIRCUS!", "red");
+          log("CAINE", "CLEANLINESS IS NEXT TO GODLINESS!", "red");
         }
       }
 
