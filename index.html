@@ -2,92 +2,100 @@
 <html>
 <head>
   <style>
-    body { background: #000; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; perspective: 1200px; }
-    /* THE 3D FLOOR */
+    body { background: #050505; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; perspective: 1200px; }
     #floor { 
-      position: absolute; width: 200%; height: 200%; top: 45%; left: -50%;
-      background-image: radial-gradient(circle, #444 1px, transparent 1px), linear-gradient(#111 2px, transparent 2px), linear-gradient(90deg, #111 2px, transparent 2px);
-      background-size: 80px 80px; transform: rotateX(70deg); z-index: 1; opacity: 0.6;
+      position: absolute; width: 200%; height: 200%; top: 40%; left: -50%;
+      background-image: radial-gradient(circle, #222 1px, transparent 1px), linear-gradient(#111 2px, transparent 2px), linear-gradient(90deg, #111 2px, transparent 2px);
+      background-size: 80px 80px; transform: rotateX(75deg); z-index: 1;
     }
-    #stage { position: relative; width: 100vw; height: 100vh; z-index: 10; transform-style: preserve-3d; }
-    .agent { position: absolute; transition: all 1.8s ease-in-out; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 8px; }
-    #chat { position: fixed; bottom: 10px; left: 10px; right: 10px; height: 90px; background: rgba(0,0,0,0.95); border: 1px solid #555; padding: 10px; font-size: 11px; z-index: 2000; color: #0f0; overflow: hidden; border-radius: 10px; }
+    .agent { position: absolute; transition: all 2s ease-in-out; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+    #exit { position: absolute; width: 50px; height: 70px; background: #00ff00; border: 4px solid #fff; box-shadow: 0 0 20px #00ff00; z-index: 5; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; transition: all 0.3s; }
+    #chat { position: fixed; bottom: 5px; left: 5px; right: 5px; height: 90px; background: rgba(0,0,0,0.9); border: 1px solid #333; padding: 10px; font-size: 10px; z-index: 2000; color: #0f0; overflow: hidden; border-radius: 8px; }
   </style>
 </head>
 <body>
   <div id="floor"></div>
+  <div id="exit">EXIT</div>
   <div id="stage">
-    <div id="caine" class="agent" style="width: 65px; height: 65px; background: red; box-shadow: 0 0 25px red; color: white; z-index: 1000;">CAINE</div>
-    <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white; z-index: 900;">JAX</div>
-    <div id="gangle" class="agent" style="width: 35px; height: 35px; background: pink; border-radius: 50%; color: black; font-size: 10px; z-index: 800;">Happy</div>
-    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; color: black; font-size: 8px; z-index: 700;">Bubble</div>
+    <div id="caine" class="agent" style="width: 60px; height: 60px; background: red; box-shadow: 0 0 25px red; color: white;">CAINE</div>
+    <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white;">JAX</div>
+    <div id="ragatha" class="agent" style="width: 45px; height: 45px; background: #b22222; border: 2px solid blue; color: white;">Ragatha</div>
+    <div id="gangle" class="agent" style="width: 30px; height: 30px; background: pink; border-radius: 50%; color: black;">Happy</div>
+    <div id="zooble" class="agent" style="width: 40px; height: 40px; background: #ff4500; border: 3px dashed yellow; color: white;">Zooble</div>
+    <div id="kinger" class="agent" style="width: 40px; height: 55px; background: #FFD700; border: 3px solid #8B4513; color: black;">Kinger</div>
+    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; color: black;">Bubble</div>
   </div>
-  <div id="chat"><div id="messages">System: 3D Room, Jax, and Gangle Masks Active...</div></div>
+  <div id="chat"><div id="messages">Digital Circus: Kinger Updated & Exit Door Active...</div></div>
 
   <script>
     const cast = [
-      { el: document.getElementById('caine'), name: "CAINE", color: "red", mood: "Master" },
-      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", mood: "Pranking" },
-      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", mood: "Happy" },
-      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", mood: "Neutral" }
+      { el: document.getElementById('caine'), name: "CAINE", color: "red", x: 100, y: 100 },
+      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", x: 200, y: 200 },
+      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#b22222", x: 300, y: 300 },
+      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", x: 150, y: 150, mood: "Happy" },
+      { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", x: 50, y: 50 },
+      { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", x: 400, y: 400 },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", x: 250, y: 250 }
     ];
 
-    function log(name, msg, color) {
+    const door = document.getElementById('exit');
+    let doorX = 500, doorY = 500;
+
+    function log(n, m, c) {
       const line = document.createElement('div');
-      line.innerHTML = `<b style="color:${color}">${name}:</b> ${msg}`;
+      line.innerHTML = `<b style="color:${c}">${n}:</b> ${m}`;
       document.getElementById('messages').prepend(line);
     }
 
+    function moveDoor() {
+        doorX = Math.random() * (window.innerWidth - 60);
+        doorY = Math.random() * (window.innerHeight - 200);
+        door.style.left = doorX + 'px';
+        door.style.top = doorY + 'px';
+    }
+
     function aiBrain(agent) {
-      const x = Math.random() * (window.innerWidth - 70);
-      const y = Math.random() * (window.innerHeight - 250);
-      
+      const x = Math.random() * (window.innerWidth - 60);
+      const y = Math.random() * (window.innerHeight - 200);
       agent.x = x; agent.y = y;
+
+      // KINGER UPDATE: He now walks (transition is kept)
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
       
-      // 3D Perspective Scaling
-      const scale = 0.4 + (y / window.innerHeight) * 1.2;
+      const scale = 0.5 + (y / window.innerHeight) * 1.0;
       agent.el.style.transform = `scale(${scale})`;
+      agent.el.style.zIndex = Math.floor(y);
 
-      // JAX PRANK LOGIC
+      // EXIT DOOR TROLLING
+      const distToDoor = Math.hypot(x - doorX, y - doorY);
+      if (distToDoor < 100 && agent.name !== "CAINE") {
+          log(agent.name, "THE EXIT!! I SEE IT!", agent.color);
+          moveDoor(); // Door teleports away
+      }
+
+      // JAX PRANK
       if (agent.name === "JAX") {
-        const gangle = cast[2];
-        const distToGangle = Math.hypot(x - gangle.x, y - gangle.y);
-        if (distToGangle < 80 && gangle.mood === "Happy") {
-          gangle.mood = "Sad";
-          gangle.el.style.background = "#444";
-          gangle.el.style.color = "white";
-          gangle.el.innerHTML = "Sad";
-          log("JAX", "Whoops! Dropped your mask, Gangle!", "#a020f0");
-          log("Gangle", "My comedy mask... it's gone...", "gray");
+        const g = cast.find(a => a.name === "Gangle");
+        if (Math.hypot(x - g.x, y - g.y) < 80) {
+          g.mood = "Sad"; g.el.style.background = "#444"; g.el.innerHTML = "Sad";
+          log("JAX", "Prank'd!", "#a020f0");
         }
       }
 
-      // CAINE ADMIN LOGIC (Fixing Gangle)
+      // CAINE ADMIN FIX
       if (agent.name === "CAINE") {
-        const gangle = cast[2];
-        const distToGangle = Math.hypot(x - gangle.x, y - gangle.y);
-        if (distToGangle < 100 && gangle.mood === "Sad") {
-          gangle.mood = "Happy";
-          gangle.el.style.background = "pink";
-          gangle.el.style.color = "black";
-          gangle.el.innerHTML = "Happy";
-          log("CAINE", "NO SADNESS IN THE CIRCUS! FIXED IT!", "red");
+        const g = cast.find(a => a.name === "Gangle");
+        if (Math.hypot(x - g.x, y - g.y) < 100 && g.mood === "Sad") {
+          g.mood = "Happy"; g.el.style.background = "pink"; g.el.innerHTML = "Happy";
+          log("CAINE", "NO SADNESS!", "red");
         }
       }
 
-      // BUILDING
-      if (agent.mood !== "Sad" && Math.random() > 0.4) {
-        const b = document.createElement('div');
-        b.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:12px; height:12px; background:${agent.el.style.background}; opacity:0.3; z-index:5; border-radius:2px;`;
-        document.getElementById('stage').appendChild(b);
-        setTimeout(() => b.remove(), 10000);
-      }
-
-      setTimeout(() => aiBrain(agent), 1500 + Math.random() * 2000);
+      setTimeout(() => aiBrain(agent), 2000 + Math.random() * 3000);
     }
 
+    moveDoor();
     cast.forEach(aiBrain);
   </script>
 </body>
