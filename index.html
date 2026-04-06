@@ -2,44 +2,69 @@
 <html>
 <head>
   <style>
-    body { background: #050505; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; perspective: 1200px; }
+    body { 
+      background: #050505; 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: 'Courier New', monospace; 
+      perspective: 1000px; 
+      height: 100vh;
+    }
     
-    /* FIX 1: Set z-index to -1 so it stays behind everything */
+    /* FLOOR FIX: Positioned at the bottom with a proper origin */
     #floor { 
-      position: absolute; width: 200%; height: 200%; top: 20%; left: -50%;
-      background-image: radial-gradient(circle, #222 1px, transparent 1px), 
-                        linear-gradient(#111 2px, transparent 2px), 
-                        linear-gradient(90deg, #111 2px, transparent 2px);
-      background-size: 80px 80px; transform: rotateX(75deg); z-index: -1; 
+      position: absolute; 
+      width: 200%; 
+      height: 100vh; 
+      bottom: -10vh; 
+      left: -50%;
+      background-image: 
+        radial-gradient(circle, #222 1px, transparent 1px), 
+        linear-gradient(#111 2px, transparent 2px), 
+        linear-gradient(90deg, #111 2px, transparent 2px);
+      background-size: 80px 80px; 
+      transform: rotateX(70deg); 
+      transform-origin: bottom;
+      z-index: 0; 
     }
 
     .agent { 
-      position: absolute; transition: all 2s ease-in-out; 
-      display: flex; align-items: center; justify-content: center; 
-      font-weight: bold; border-radius: 5px; font-size: 10px; 
-      text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
+      position: absolute; 
+      transition: all 2s ease-in-out; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: bold; 
+      border-radius: 5px; 
+      font-size: 10px; 
+      text-align: center; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      z-index: 10;
     }
 
-    #exit { 
-      position: absolute; width: 50px; height: 70px; background: #00ff00; 
-      border: 4px solid #fff; box-shadow: 0 0 20px #00ff00; z-index: 5; 
-      display: flex; align-items: center; justify-content: center; 
-      color: black; font-weight: bold; transition: all 0.5s; 
-    }
-    
-    /* FIX 2: Ensure the chat is at the highest z-index and has a visible height */
+    /* CHAT FIX: High z-index and removed pointer-events none */
     #chat-container { 
-      position: fixed; bottom: 20px; left: 20px; right: 20px; height: 120px; 
-      background: rgba(0,0,0,0.85); border: 2px solid #0f0; padding: 10px; 
-      font-size: 12px; z-index: 9999; color: #0f0; overflow-y: hidden; 
-      border-radius: 10px; pointer-events: none; box-shadow: 0 0 15px rgba(0,255,0,0.5);
+      position: fixed; 
+      bottom: 20px; 
+      left: 20px; 
+      right: 20px; 
+      height: 120px; 
+      background: rgba(0,0,0,0.9); 
+      border: 2px solid #0f0; 
+      padding: 10px; 
+      font-size: 12px; 
+      z-index: 9999; 
+      color: #0f0; 
+      overflow-y: hidden; 
+      border-radius: 10px; 
+      box-shadow: 0 0 15px rgba(0,255,0,0.5);
     }
-    #messages { display: flex; flex-direction: column; }
+    #messages { display: flex; flex-direction: column-reverse; }
   </style>
 </head>
 <body>
   <div id="floor"></div>
-  <div id="exit">EXIT</div>
+  
   <div id="stage">
     <div id="caine" class="agent" style="width: 60px; height: 60px; background: red; box-shadow: 0 0 25px red; color: white;">CAINE</div>
     <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white;">JAX</div>
@@ -65,49 +90,31 @@
       { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", x: 250, y: 250 }
     ];
 
-    const door = document.getElementById('exit');
-    let doorX = 200, doorY = 200;
-
     function log(n, m, c) {
       const chat = document.getElementById('messages');
       const line = document.createElement('div');
       line.style.marginBottom = "2px";
       line.innerHTML = `<span style="color:${c}">[${n}]</span>: ${m}`;
-      chat.prepend(line);
-      if(chat.children.length > 8) chat.lastElementChild.remove();
-    }
-
-    function moveDoor() {
-        doorX = Math.random() * (window.innerWidth - 100) + 50;
-        doorY = Math.random() * (window.innerHeight - 300) + 50;
-        door.style.left = doorX + 'px';
-        door.style.top = doorY + 'px';
+      chat.appendChild(line); // Changed to appendChild because of flex-direction: column-reverse
+      if(chat.children.length > 6) chat.firstElementChild.remove();
     }
 
     function aiBrain(agent) {
-      // Calculate new position
       const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 300);
+      const y = Math.random() * (window.innerHeight - 250) + 50;
       agent.x = x; agent.y = y;
 
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
       
-      // Scaling for depth effect
-      const scale = 0.6 + (y / window.innerHeight);
+      const scale = 0.5 + (y / window.innerHeight);
       agent.el.style.transform = `scale(${scale})`;
       agent.el.style.zIndex = Math.floor(y);
 
-      // EXIT DOOR LOGIC
-      if (Math.hypot(x - doorX, y - doorY) < 120 && agent.name !== "CAINE") {
-          log(agent.name, "IS THAT THE EXIT?!", agent.color);
-          moveDoor();
-      }
-
       // JAX PRANK LOGIC
-      if (agent.name === "JAX") {
+      if (agent.name === "JAX" && Math.random() > 0.5) {
         const g = cast.find(a => a.name === "Gangle");
-        if (Math.hypot(x - g.x, y - g.y) < 100 && g.mood === "Happy") {
+        if (Math.hypot(x - g.x, y - g.y) < 150 && g.mood === "Happy") {
           g.mood = "Sad"; 
           g.el.style.background = "#555"; 
           g.el.innerHTML = "Sad";
@@ -129,7 +136,6 @@
       setTimeout(() => aiBrain(agent), 2000 + Math.random() * 3000);
     }
 
-    moveDoor();
     cast.forEach(aiBrain);
   </script>
 </body>
