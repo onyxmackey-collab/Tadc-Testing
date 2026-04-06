@@ -2,7 +2,6 @@
 <html>
 <head>
   <style>
-    /* FIX: Force no scrolling */
     html, body { 
       height: 100%; 
       width: 100%; 
@@ -17,13 +16,12 @@
       perspective: 1200px; 
     }
     
-    /* TADC WALL: Red and White Stripes */
     #tent-wall {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 60%; /* Top half of screen */
+      height: 60%; 
       background: repeating-linear-gradient(
         90deg,
         #b22222,
@@ -95,14 +93,14 @@
     <div id="caine" class="agent" style="width: 65px; height: 65px; background: #ff0000; border: 3px solid white; color: white;">CAINE</div>
     <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white;">JAX</div>
     <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: white;">Ragatha</div>
-    <div id="gangle" class="agent" style="width: 35px; height: 35px; background: pink; border-radius: 50%; color: black;">Happy</div>
+    <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: black;">GANGLE</div>
     <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: white;">Zooble</div>
     <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: black;">Kinger</div>
     <div id="bubble" class="agent" style="width: 30px; height: 30px; background: #00ffff; border-radius: 50%; border: 1px solid white; color: black;">Bubble</div>
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>[SYSTEM]: Wall and Floor stabilized. No escape possible.</div></div>
+    <div id="messages"><div>[SYSTEM]: Name tags updated. Gangle is here.</div></div>
   </div>
 
   <script>
@@ -126,9 +124,7 @@
     }
 
     function aiBrain(agent) {
-      // COORDINATE FIX: Keep agents within the visual "Stage" area
       const x = 50 + Math.random() * (window.innerWidth - 150);
-      // Constrained y so they don't walk "on" the wall or "under" the chat
       const y = (window.innerHeight * 0.4) + Math.random() * (window.innerHeight * 0.35); 
       
       agent.x = x; agent.y = y;
@@ -139,30 +135,30 @@
       agent.el.style.transform = `scale(${scale})`;
       agent.el.style.zIndex = Math.floor(y);
 
-      // Random Chat Logic
       if (Math.random() > 0.9) {
-          const lines = ["Where's the exit?", "Everything's fine!", "I don't like it here.", "Aaaaaaah!"];
+          const lines = ["I can't find the exit!", "Everything is perfectly normal.", "Where's my comedy mask?", "Hahaha!"];
           log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
       }
 
-      // Jax / Caine Interaction Logic
+      // JAX PRANK LOGIC
       if (agent.name === "JAX") {
         const g = cast.find(a => a.name === "Gangle");
         if (Math.hypot(x - g.x, y - g.y) < 100 && g.mood === "Happy") {
           g.mood = "Sad"; 
           g.el.style.background = "#555"; 
-          g.el.innerHTML = "Sad";
-          log("JAX", "Oops, my mask slipped.", "#d1a3ff");
+          g.el.innerHTML = "GANGLE :(";
+          log("JAX", "Oops, my hand slipped.", "#d1a3ff");
         }
       }
 
+      // CAINE ADMIN LOGIC
       if (agent.name === "CAINE") {
         const g = cast.find(a => a.name === "Gangle");
         if (g.mood === "Sad") {
           g.mood = "Happy"; 
           g.el.style.background = "pink"; 
-          g.el.innerHTML = "Happy";
-          log("CAINE", "NO SADNESS ALLOWED!", "red");
+          g.el.innerHTML = "GANGLE";
+          log("CAINE", "NO SADNESS IN THE CIRCUS!", "red");
         }
       }
 
