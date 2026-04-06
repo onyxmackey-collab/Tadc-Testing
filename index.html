@@ -5,37 +5,47 @@
     html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; }
     body { font-family: 'Courier New', monospace; perspective: 1200px; }
     
+    /* THE TENT WALL */
     #tent-wall {
       position: absolute; top: 0; left: 0; width: 100%; height: 65%; 
       background: repeating-linear-gradient(90deg, #e61d2b, #e61d2b 60px, #ffdf00 60px, #ffdf00 120px);
       border-bottom: 8px solid #000; z-index: -10; overflow: hidden;
     }
 
-    /* THE ZIPPER (CENTER) */
+    /* THE ZIPPER */
     .center-pole { position: absolute; left: 50%; top: 0; width: 12px; height: 100%; background: #222; transform: translateX(-50%); }
     .spiral { position: absolute; left: 50%; width: 50px; height: 100%; background: repeating-linear-gradient(transparent, transparent 20px, #f00 20px, #f00 40px); transform: translateX(-50%) skewY(-15deg); opacity: 0.7; }
 
-    /* FIXED BLOCKS: Sitting ON the floor line */
-    .block-stack {
-      position: absolute; bottom: 0; width: 100px; height: 220px;
-      background: #000; border: 4px solid #000; display: flex; flex-direction: column; z-index: -5;
+    /* SPIRAL TUBES LEADING TO FLOOR */
+    .spiral-tube {
+      position: absolute; bottom: -20px; width: 60px; height: 300px;
+      background: repeating-linear-gradient(0deg, #ff0, #ff0 20px, #00f 20px, #00f 40px);
+      border: 4px solid #000; border-radius: 30px;
+      transform: rotate(15deg) skewX(-10deg); z-index: -5;
     }
-    .cube-part { flex: 1; border: 2px solid rgba(255,255,255,0.3); }
 
-    /* NEW DECORATIONS FOR EMPTY SPOTS */
-    .cloud {
-      position: absolute; width: 120px; height: 50px; background: #fff; border-radius: 50px;
-      top: 150px; left: 22%; filter: drop-shadow(8px 8px 0 rgba(0,0,0,0.2));
+    /* RAINBOWS */
+    .rainbow {
+      position: absolute; bottom: 0; width: 140px; height: 70px;
+      border-radius: 140px 140px 0 0;
+      background: radial-gradient(circle at 50% 100%, transparent 20px, #f00 20px 30px, #ff0 30px 40px, #0f0 40px 50px, #00f 50px 60px);
+      border-bottom: none; z-index: -4;
     }
-    .cloud::after { content: ''; position: absolute; width: 60px; height: 60px; background: #fff; border-radius: 50%; top: -30px; left: 15px; }
-    
+
+    /* STATIONARY DECORATIONS */
     .giant-star {
-      position: absolute; top: 120px; right: 20%; width: 80px; height: 80px;
+      position: absolute; top: 100px; right: 15%; width: 90px; height: 90px;
       background: #ff0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      border: 5px solid #000; animation: rotateStar 10s linear infinite;
+      border: 5px solid #000; z-index: -3;
     }
-    @keyframes rotateStar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+    .sky-portal {
+      position: absolute; width: 140px; height: 140px; background: skyblue; 
+      border-radius: 50%; top: 40px; left: 8%; border: 8px solid #4a148c;
+      background: radial-gradient(circle, #fff, #87ceeb);
+    }
+
+    /* THE FLOOR */
     #floor { 
       position: absolute; width: 400%; height: 150vh; bottom: -10vh; left: -150%;
       background-color: #fff; 
@@ -64,44 +74,38 @@
 </head>
 <body>
   <div id="tent-wall">
-    <div class="sky-portal" style="position: absolute; width: 140px; height: 140px; background: skyblue; border-radius: 50%; top: 30px; left: 5%; border: 6px solid #4a148c;"></div>
+    <div class="sky-portal"></div>
     <div class="center-pole"></div>
     <div class="spiral"></div>
     
-    <!-- LEFT SIDE FILLER -->
-    <div class="cloud"></div>
-    <div class="block-stack" style="left: 0;">
-      <div class="cube-part" style="background: #f00;"></div>
-      <div class="cube-part" style="background: #00f;"></div>
-      <div class="cube-part" style="background: #0f0;"></div>
-    </div>
+    <!-- Spiral Tubes leading down to the floor -->
+    <div class="spiral-tube" style="left: 2%;"></div>
+    <div class="spiral-tube" style="right: 2%; transform: rotate(-15deg) skewX(10deg);"></div>
 
-    <!-- RIGHT SIDE FILLER -->
+    <!-- Rainbows in the empty spaces -->
+    <div class="rainbow" style="left: 25%;"></div>
+    <div class="rainbow" style="right: 25%;"></div>
+
     <div class="giant-star"></div>
-    <div class="block-stack" style="right: 0;">
-      <div class="cube-part" style="background: #ff0;"></div>
-      <div class="cube-part" style="background: #f0f;"></div>
-      <div class="cube-part" style="background: #0ff;"></div>
-    </div>
-
-    <div class="pipe" style="position: absolute; top: 100px; left: 40%; width: 400px; height: 30px; background: linear-gradient(90deg, red, yellow, blue, green); border: 3px solid #000; border-radius: 20px; transform: rotate(-10deg);"></div>
+    
+    <div class="pipe" style="position: absolute; top: 120px; left: 35%; width: 300px; height: 35px; background: linear-gradient(90deg, #f00, #ff0, #00f, #0f0); border: 4px solid #000; border-radius: 20px; transform: rotate(-5deg); z-index: -2;"></div>
   </div>
 
   <div id="floor"></div>
   
   <div id="stage">
-    <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #ff0000 50%, #0000ff 50%); color: white; border: 2px solid white;">POMNI</div>
-    <div id="caine" class="agent" style="width: 65px; height: 65px; background: #ff0000; border: 3px solid white; color: white;">CAINE</div>
-    <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: white;">JAX</div>
-    <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: white;">Ragatha</div>
-    <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: black;">GANGLE</div>
-    <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: white;">Zooble</div>
-    <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: black;">Kinger</div>
-    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: #00ffff; border-radius: 50%; border: 1px solid white; color: black;">Bubble</div>
+    <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff;">POMNI</div>
+    <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff;">CAINE</div>
+    <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff;">JAX</div>
+    <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff;">Ragatha</div>
+    <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000;">GANGLE</div>
+    <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff;">Zooble</div>
+    <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000;">Kinger</div>
+    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: #0ff; border-radius: 50%; border: 1px solid #fff; color: #000;">Bubble</div>
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>[SYSTEM]: Perspective fixed. Circus depth stabilized.</div></div>
+    <div id="messages"><div>[SYSTEM]: Set architecture finalized. Do not attempt to climb the tubes.</div></div>
   </div>
 
   <script>
@@ -126,7 +130,7 @@
 
     function aiBrain(agent) {
       const nextX = 50 + Math.random() * (window.innerWidth - 150);
-      const nextY = (window.innerHeight * 0.62) + Math.random() * (window.innerHeight * 0.2); 
+      const nextY = (window.innerHeight * 0.62) + Math.random() * (window.innerHeight * 0.22); 
       
       agent.el.classList.add('walking');
       agent.el.style.left = nextX + 'px';
@@ -135,6 +139,11 @@
       const scale = 0.6 + ((nextY - (window.innerHeight * 0.6)) / (window.innerHeight * 0.2)) * 0.4;
       agent.el.style.transform = `scale(${scale})`;
       agent.el.style.zIndex = Math.floor(nextY);
+
+      if (Math.random() > 0.9) {
+          const lines = ["Look at the rainbows!", "I like the spiral tubes.", "This floor is dizzying.", "Everything is so colorful!"];
+          log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
+      }
 
       setTimeout(() => { agent.el.classList.remove('walking'); }, 2000);
       setTimeout(() => aiBrain(agent), 3000 + Math.random() * 4000);
