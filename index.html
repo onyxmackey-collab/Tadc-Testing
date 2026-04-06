@@ -63,9 +63,7 @@
     </div>
     <div id="floor"></div>
     <div id="stage">
-      <!-- POMNI ADDED BACK WITH EXPLICIT STARTING POSITION -->
-      <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff; left: 20%; top: 75%;">POMNI</div>
-      
+      <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff; border-radius: 5px; left: 20%; top: 75%;">POMNI</div>
       <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff; left: 50%; top: 70%;"><div class="hovering-wrap">CAINE</div></div>
       <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff; left: 80%; top: 80%;">JAX</div>
       <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff; left: 40%; top: 85%;">Ragatha</div>
@@ -119,7 +117,6 @@
           return;
         }
 
-        // Target the floor specifically (65% to 90% height)
         const nextX = 50 + Math.random() * (window.innerWidth - 100);
         const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.25); 
         
@@ -129,7 +126,6 @@
           agent.el.classList.add('walking');
         }
 
-        // Perspective scaling
         const scale = 0.7 + ((nextY / window.innerHeight) * 0.3);
         agent.el.style.transform = `scale(${scale})`;
         agent.el.style.left = nextX + 'px';
@@ -142,7 +138,6 @@
       move();
     }
 
-    // Start everything
     window.onload = () => {
       cast.forEach(aiBrain);
       socialEngine();
