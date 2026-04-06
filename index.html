@@ -8,47 +8,47 @@
     /* TADC WALL: Red and Yellow Stripes */
     #tent-wall {
       position: absolute; top: 0; left: 0; width: 100%; height: 60%; 
-      background: repeating-linear-gradient(
-        90deg,
-        #b22222, /* Red */
-        #b22222 60px,
-        #ffd700 60px, /* Yellow */
-        #ffd700 120px
-      );
-      border-bottom: 8px solid #000;
-      z-index: -2;
+      background: repeating-linear-gradient(90deg, #b22222, #b22222 60px, #ffd700 60px, #ffd700 120px);
+      border-bottom: 8px solid #000; z-index: -10; overflow: hidden;
     }
 
-    /* TADC FLOOR: Black and White Checkers */
+    /* DECORATIONS */
+    .portal { 
+      position: absolute; width: 120px; height: 120px; background: skyblue; 
+      border-radius: 50%; border: 8px solid #5d2b8a; top: 20px; left: 15%;
+      background: radial-gradient(circle, #fff, #87ceeb); box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .tube {
+      position: absolute; height: 15px; background: linear-gradient(90deg, red, yellow, blue, green);
+      width: 300px; transform: rotate(-10deg); top: 100px; left: 40%; border-radius: 10px;
+    }
+    .cube {
+      position: absolute; width: 40px; height: 40px; top: 30px; right: 10%;
+      background: repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 10px 10px;
+      transform: rotate(25deg); border: 2px solid #000;
+    }
+    .curtain {
+      position: absolute; bottom: 0; width: 80px; height: 60px; 
+      background: #800; border-radius: 40px 40px 0 0; border: 4px solid #400;
+    }
+
+    /* TADC FLOOR */
     #floor { 
       position: absolute; width: 400%; height: 150vh; bottom: -10vh; left: -150%;
       background-color: #fff; 
-      background-image: conic-gradient(
-        #000 90deg, 
-        transparent 90deg 180deg, 
-        #000 180deg 270deg, 
-        transparent 270deg
-      );
-      background-size: 100px 100px; 
-      transform: rotateX(70deg); 
-      transform-origin: bottom center;
-      box-shadow: inset 0 0 200px rgba(0,0,0,1); 
-      z-index: -1; 
+      background-image: conic-gradient(#000 90deg, transparent 90deg 180deg, #000 180deg 270deg, transparent 270deg);
+      background-size: 100px 100px; transform: rotateX(70deg); transform-origin: bottom center;
+      box-shadow: inset 0 0 200px rgba(0,0,0,1); z-index: -1; 
     }
 
     .agent { 
-      position: absolute; 
-      transition: left 2s ease-in-out, top 2s ease-in-out, transform 0.3s; 
+      position: absolute; transition: left 2s ease-in-out, top 2s ease-in-out, transform 0.3s; 
       display: flex; align-items: center; justify-content: center; 
-      font-weight: bold; border-radius: 5px; font-size: 10px; 
-      text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.8);
-      transform-origin: bottom center;
+      font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center;
     }
 
-    @keyframes walkBob {
-      0%, 100% { margin-top: 0px; }
-      50% { margin-top: -12px; }
-    }
+    @keyframes walkBob { 0%, 100% { margin-top: 0px; } 50% { margin-top: -12px; } }
     .walking { animation: walkBob 0.4s infinite; }
 
     #chat-container { 
@@ -61,7 +61,16 @@
   </style>
 </head>
 <body>
-  <div id="tent-wall"></div>
+  <div id="tent-wall">
+    <div class="portal"></div>
+    <div class="portal" style="left: 70%; top: 50px; width: 80px; height: 80px;"></div>
+    <div class="tube"></div>
+    <div class="tube" style="top: 180px; left: 10%; transform: rotate(5deg); width: 400px;"></div>
+    <div class="cube"></div>
+    <div class="curtain" style="left: 20%;"></div>
+    <div class="curtain" style="left: 45%;"></div>
+    <div class="curtain" style="left: 70%;"></div>
+  </div>
   <div id="floor"></div>
   
   <div id="stage">
@@ -76,7 +85,7 @@
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>[SYSTEM]: Visual overhaul complete. Entering the tent...</div></div>
+    <div id="messages"><div>[SYSTEM]: Tent interior decorated. Playtime is forever.</div></div>
   </div>
 
   <script>
@@ -101,11 +110,10 @@
 
     function aiBrain(agent) {
       const nextX = 50 + Math.random() * (window.innerWidth - 150);
-      const nextY = (window.innerHeight * 0.5) + Math.random() * (window.innerHeight * 0.25); 
+      const nextY = (window.innerHeight * 0.55) + Math.random() * (window.innerHeight * 0.2); 
       
       agent.el.classList.add('walking');
-      agent.x = nextX; 
-      agent.y = nextY;
+      agent.x = nextX; agent.y = nextY;
       agent.el.style.left = nextX + 'px';
       agent.el.style.top = nextY + 'px';
       
@@ -115,18 +123,16 @@
 
       setTimeout(() => { agent.el.classList.remove('walking'); }, 2000);
 
-      if (Math.random() > 0.92) {
-          const lines = ["Why are the walls so bright?", "Everything is black and white...", "I'm not abstracted! I'm not!", "Who's watching us?"];
+      if (Math.random() > 0.9) {
+          const lines = ["Look at the floating cube!", "Can we go through the blue holes?", "I like the tubes.", "Caine is watching..."];
           log(agent.name, lines[Math.floor(Math.random()*lines.length)], agent.color);
       }
 
+      // Jax/Gangle interactions stay the same
       if (agent.name === "JAX") {
         const g = cast.find(a => a.name === "Gangle");
-        if (Math.hypot(agent.x - g.x, agent.y - g.y) < 100 && g.mood === "Happy") {
-          g.mood = "Sad"; 
-          g.el.style.background = "#333"; 
-          g.el.style.color = "white";
-          g.el.innerHTML = "GANGLE :(";
+        if (Math.hypot(agent.x - g.x, agent.y - g.y) < 80 && g.mood === "Happy") {
+          g.mood = "Sad"; g.el.style.background = "#333"; g.el.style.color = "white"; g.el.innerHTML = "GANGLE :(";
           log("JAX", "Oops, my hand slipped.", "#d1a3ff");
         }
       }
@@ -134,17 +140,13 @@
       if (agent.name === "CAINE") {
         const g = cast.find(a => a.name === "Gangle");
         if (g.mood === "Sad") {
-          g.mood = "Happy"; 
-          g.el.style.background = "pink"; 
-          g.el.style.color = "black";
-          g.el.innerHTML = "GANGLE";
-          log("CAINE", "NO SADNESS ALLOWED!", "red");
+          g.mood = "Happy"; g.el.style.background = "pink"; g.el.style.color = "black"; g.el.innerHTML = "GANGLE";
+          log("CAINE", "NO SADNESS!", "red");
         }
       }
 
       setTimeout(() => aiBrain(agent), 3000 + Math.random() * 4000);
     }
-
     cast.forEach(aiBrain);
   </script>
 </body>
