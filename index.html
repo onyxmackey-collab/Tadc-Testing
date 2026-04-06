@@ -3,16 +3,15 @@
 <head>
   <style>
     html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; }
-    
     #circus-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
 
+    /* LAYERS: Wall(10), Floor(5), Agents(20-1000) */
     #tent-wall {
       position: absolute; top: 0; left: 0; width: 100%; height: 60%; 
       background: repeating-linear-gradient(90deg, #e61d2b, #e61d2b 60px, #ffdf00 60px, #ffdf00 120px);
       border-bottom: 10px solid #000; z-index: 10; overflow: hidden;
     }
 
-    /* DECORATIONS */
     .center-pole { position: absolute; left: 50%; top: 0; width: 12px; height: 100%; background: #222; transform: translateX(-50%); }
     .spiral { position: absolute; left: 50%; width: 50px; height: 100%; background: repeating-linear-gradient(transparent, transparent 20px, #f00 20px, #f00 40px); transform: translateX(-50%) skewY(-15deg); opacity: 0.7; }
     .deco-hoop { position: absolute; border: 15px solid #0f0; border-radius: 50%; z-index: 11; }
@@ -27,21 +26,20 @@
       position: absolute; width: 150%; height: 100%; top: 59%; left: -25%;
       background-color: #fff;
       background-image: conic-gradient(#000 90deg, transparent 90deg 180deg, #000 180deg 270deg, transparent 270deg);
-      background-size: 80px 80px; transform: perspective(800px) rotateX(70deg); transform-origin: top center; z-index: 1;
+      background-size: 80px 80px; transform: perspective(800px) rotateX(70deg); transform-origin: top center; z-index: 5;
     }
 
     .agent { 
       position: absolute; transition: all 2.5s ease-in-out; 
       display: flex; align-items: center; justify-content: center; 
       font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
-      box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center; z-index: 20;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center; z-index: 100;
     }
 
-    /* SHINY BUBBLE EFFECT */
     #bubble { 
       background: radial-gradient(circle at 30% 30%, white, rgba(255,255,255,0.2) 20%, rgba(0,255,255,0.4) 60%, rgba(0,255,255,0.8));
       border: 1px solid white; box-shadow: inset -5px -5px 10px rgba(255,255,255,0.5), 0 0 15px cyan;
-      transition: all 1s linear; /* Faster transition for following */
+      transition: all 1s linear; 
     }
 
     @keyframes walkBob { 0%, 100% { margin-top: 0px; } 50% { margin-top: -15px; } }
@@ -50,7 +48,7 @@
     @keyframes hoverFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     .hovering-wrap { animation: hoverFloat 2s ease-in-out infinite; }
 
-    #chat-container { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 120px; background: rgba(0, 0, 0, 0.95); border: 3px solid #ffd700; padding: 10px; z-index: 9999; border-radius: 15px; overflow: hidden; }
+    #chat-container { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 120px; background: rgba(0, 0, 0, 0.95); border: 3px solid #ffd700; padding: 10px; z-index: 9999; border-radius: 15px; overflow: hidden; pointer-events: none; }
     #messages { display: flex; flex-direction: column-reverse; color: #ffd700; font-size: 13px; }
   </style>
 </head>
@@ -73,7 +71,6 @@
       <div id="bubble" class="agent" style="width: 30px; height: 30px; border-radius: 50%; color: #000;">Bubble</div>
     </div>
   </div>
-
   <div id="chat-container"><div id="messages"></div></div>
 
   <script>
@@ -85,7 +82,7 @@
       { el: document.getElementById('gangle'), name: "Gangle", color: "pink", lines: ["My mask...", "I'm sad."] },
       { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500", lines: ["Leave me alone.", "I hate this."] },
       { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700", lines: ["INSECTS?!", "AH! A STRANGER!"] },
-      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", lines: ["YUM SOAP!", "I'm Caine's sidekick!"] }
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", lines: ["YUM SOAP!", "POP!"] }
     ];
 
     function log(n, m, c) {
@@ -102,25 +99,22 @@
       setTimeout(socialEngine, 5000 + Math.random() * 5000);
     }
 
-    // Positions tracker for Bubble
-    let cainePos = { x: 100, y: 100 };
+    let cainePos = { x: 100, y: window.innerHeight * 0.7 };
 
     function aiBrain(agent) {
       if (agent.name === "Bubble") {
-        // BUBBLE FOLLOW LOGIC: Target Caine's current position with a small offset
-        const nextX = cainePos.x - 40;
-        const nextY = cainePos.y - 10;
-        
+        const nextX = cainePos.x - 50;
+        const nextY = cainePos.y - 15;
         agent.el.style.left = nextX + 'px';
         agent.el.style.top = nextY + 'px';
-        agent.el.style.zIndex = Math.floor(nextY) + 1;
-        
-        setTimeout(() => aiBrain(agent), 1000); // Bubble updates faster to keep up
+        agent.el.style.zIndex = 1000;
+        setTimeout(() => aiBrain(agent), 1000);
         return;
       }
 
+      // BOUNDARY FIX: Ensuring they stay between 60% and 90% of screen height
       const nextX = 50 + Math.random() * (window.innerWidth - 150);
-      const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.25); 
+      const nextY = (window.innerHeight * 0.62) + Math.random() * (window.innerHeight * 0.25); 
       
       if (agent.name === "CAINE") {
         cainePos = { x: nextX, y: nextY };
@@ -131,9 +125,10 @@
       agent.el.style.left = nextX + 'px';
       agent.el.style.top = nextY + 'px';
       
+      // Scaling fix: Ensure they never scale to 0
       const scale = 0.6 + ((nextY / window.innerHeight) * 0.4);
       agent.el.style.transform = `scale(${scale})`;
-      agent.el.style.zIndex = Math.floor(nextY);
+      agent.el.style.zIndex = 200 + Math.floor(nextY);
 
       setTimeout(() => { agent.el.classList.remove('walking'); }, 2500);
       setTimeout(() => aiBrain(agent), 4000 + Math.random() * 3000);
