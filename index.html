@@ -1,74 +1,65 @@
 <!DOCTYPE html>
 <html>
-<body style="background: #111; margin: 0; overflow: hidden; font-family: 'Courier New', Courier, monospace; color: white;">
+<body style="background: #111; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; color: white;">
 
-  <!-- AGENT BODIES -->
-  <div id="caine" style="width: 60px; height: 60px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 100; border-radius: 5px;">CAINE</div>
-  <div id="bubble" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; position: absolute; display: flex; align-items: center; justify-content: center; color: black; font-size: 8px; z-index: 90;">Bubble</div>
+  <!-- THE CAST -->
+  <div id="caine" style="width: 60px; height: 60px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 100; transition: all 0.8s ease-out;">CAINE</div>
+  <div id="bubble" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; position: absolute; display: flex; align-items: center; justify-content: center; color: black; font-size: 8px; z-index: 90; transition: all 1.2s ease-in-out;">Bubble</div>
+  <div id="jax" style="width: 40px; height: 40px; background: #a020f0; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 95; transition: all 1s ease-in-out;">JAX</div>
 
-  <!-- GROUP CHAT BOX -->
-  <div id="chat" style="position: fixed; bottom: 10px; left: 10px; right: 10px; height: 80px; background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 10px; font-size: 12px; overflow-y: hidden; z-index: 200; color: #0f0;">
-    <div id="messages">Initializing Digital Circus...</div>
+  <!-- CHAT BOX -->
+  <div id="chat" style="position: fixed; bottom: 10px; left: 10px; right: 10px; height: 80px; background: rgba(0,0,0,0.9); border: 1px solid #444; padding: 10px; font-size: 11px; overflow: hidden; z-index: 200; color: #0f0;">
+    <div id="messages">Digital Circus: AI Personalities Loaded...</div>
   </div>
 
   <script>
-    const caineObj = { el: document.getElementById('caine'), x: 50, y: 50, vx: 2, vy: 2, name: "CAINE" };
-    const bubbleObj = { el: document.getElementById('bubble'), x: 200, y: 200, vx: 4, vy: 4, name: "Bubble" };
-    const chat = document.getElementById('messages');
+    const agents = [
+      { el: document.getElementById('caine'), name: "CAINE", color: "red", power: 100 },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", power: 1 },
+      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", power: 50 }
+    ];
 
     function log(name, msg, color) {
+      const chat = document.getElementById('messages');
       const line = document.createElement('div');
       line.innerHTML = `<b style="color:${color}">${name}:</b> ${msg}`;
-      chat.prepend(line); // Newest messages at the top
+      chat.prepend(line);
     }
 
-    // RANDOM CHATTER LOGIC
-    setInterval(() => {
-      const dist = Math.hypot(caineObj.x - bubbleObj.x, caineObj.y - bubbleObj.y);
-      if (dist < 150) {
-        log("CAINE", "OBEY THE RULES, BUBBLE!", "red");
-        log("Bubble", "Yes, Master Caine...", "cyan");
-      } else {
-        const quotes = ["Everything is fine!", "Building more shapes...", "I love this circus!"];
-        log("Bubble", quotes[Math.floor(Math.random()*quotes.length)], "cyan");
-      }
-    }, 4000);
+    function makeDecision(agent) {
+      // Pick a random spot on the screen
+      const nextX = Math.random() * (window.innerWidth - 60);
+      const nextY = Math.random() * (window.innerHeight - 150);
+      
+      // Apply the move
+      agent.el.style.left = nextX + 'px';
+      agent.el.style.top = nextY + 'px';
 
-    function moveAgent(agent) {
-      agent.x += agent.vx;
-      agent.y += agent.vy;
-
-      // Bounce off walls
-      if (agent.x < 0 || agent.x > window.innerWidth - 60) agent.vx *= -1;
-      if (agent.y < 0 || agent.y > window.innerHeight - 150) agent.vy *= -1;
-
-      agent.el.style.left = agent.x + 'px';
-      agent.el.style.top = agent.y + 'px';
-
-      // BUILDING LOGIC
-      if (Math.random() > 0.98) {
+      // Chance to "Build" at the new location
+      if (Math.random() > 0.4) {
         const block = document.createElement('div');
-        block.style.position = 'absolute';
-        block.style.left = agent.x + (agent === caineObj ? 20 : 10) + 'px';
-        block.style.top = agent.y + (agent === caineObj ? 20 : 10) + 'px';
-        block.style.width = '8px';
-        block.style.height = '8px';
+        block.style.cssText = `position:absolute; left:${nextX}px; top:${nextY}px; width:12px; height:12px; background:${agent.color}; opacity:0.6;`;
         
-        const dist = Math.hypot(caineObj.x - bubbleObj.x, caineObj.y - bubbleObj.y);
-        block.style.background = (agent === caineObj || dist < 150) ? 'red' : 'cyan';
-        
+        // JAX PRANK: If Jax is near Bubble's block, he turns it purple
         document.body.appendChild(block);
-        setTimeout(() => block.remove(), 8000);
+        setTimeout(() => block.remove(), 15000);
       }
+
+      // Random "Think" time before moving again (1 to 4 seconds)
+      const waitTime = 1000 + Math.random() * 3000;
+      setTimeout(() => makeDecision(agent), waitTime);
     }
 
-    function animate() {
-      moveAgent(caineObj);
-      moveAgent(bubbleObj);
-      requestAnimationFrame(animate);
-    }
+    // Initialize their "Free Will"
+    agents.forEach(agent => makeDecision(agent));
 
-    animate();
+    // Social Logic Loop
+    setInterval(() => {
+      const r = Math.random();
+      if (r > 0.8) log("CAINE", "I AM THE MASTER OF THIS REALM!", "red");
+      else if (r > 0.5) log("JAX", "Hey Bubble, watch this prank.", "#a020f0");
+      else log("Bubble", "I'm just happy to be here!", "cyan");
+    }, 5000);
   </script>
 </body>
 </html>
