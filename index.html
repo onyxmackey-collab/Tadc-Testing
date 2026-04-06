@@ -5,6 +5,7 @@
     html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; background: #000; }
     body { font-family: 'Courier New', monospace; perspective: 1200px; }
     
+    /* THE TENT WALL - ALL TRANSITIONS REMOVED */
     #tent-wall {
       position: absolute; top: 0; left: 0; width: 100%; height: 65%; 
       background: repeating-linear-gradient(90deg, #e61d2b, #e61d2b 60px, #ffdf00 60px, #ffdf00 120px);
@@ -14,97 +15,128 @@
     .center-pole { position: absolute; left: 50%; top: 0; width: 12px; height: 100%; background: #222; transform: translateX(-50%); }
     .spiral { position: absolute; left: 50%; width: 50px; height: 100%; background: repeating-linear-gradient(transparent, transparent 20px, #f00 20px, #f00 40px); transform: translateX(-50%) skewY(-15deg); opacity: 0.7; }
 
-    /* FLOOR */
+    /* STATIC DECORATIONS - NO ANIMATIONS */
+    .deco-hoop { position: absolute; border: 15px solid #0f0; border-radius: 50%; z-index: -5; }
+    
+    .huge-hoop-left { left: 5%; top: 38%; width: 180px; height: 180px; border-width: 22px; }
+    .mid-hoop-right { right: 18%; top: 22%; width: 70px; height: 70px; border-width: 12px; }
+    .small-hoop-right { right: 10%; top: 50%; width: 50px; height: 50px; border-width: 10px; }
+    .zipper-halo { left: 50%; top: 30%; width: 120px; height: 35px; border-width: 10px; transform: translateX(-50%) rotateX(75deg); }
+
+    .block-stack {
+      position: absolute; width: 45px; height: 100px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .mini-block { width: 100%; flex: 1; border: 3px solid #000; border-radius: 3px; }
+
+    .rainbow {
+      position: absolute; bottom: 0; width: 140px; height: 70px;
+      border-radius: 140px 140px 0 0;
+      background: radial-gradient(circle at 50% 100%, transparent 20px, #f00 20px 30px, #ff0 30px 40px, #0f0 40px 50px, #00f 50px 60px);
+    }
+    .giant-star {
+      position: absolute; top: 100px; right: 15%; width: 85px; height: 85px;
+      background: #ff0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      border: 5px solid #000;
+    }
+    .sky-portal {
+      position: absolute; width: 130px; height: 130px; background: radial-gradient(circle, #fff, #87ceeb); 
+      border-radius: 50%; top: 35px; left: 8%; border: 8px solid #4a148c;
+    }
+
     #floor { 
       position: absolute; width: 400%; height: 150vh; bottom: -10vh; left: -150%;
+      background-color: #fff; 
       background-image: conic-gradient(#000 90deg, transparent 90deg 180deg, #000 180deg 270deg, transparent 270deg);
       background-size: 100px 100px; transform: rotateX(72deg); transform-origin: bottom center;
       box-shadow: inset 0 0 200px rgba(0,0,0,1); z-index: -1; 
     }
 
-    /* CHARACTER BASE STYLES */
+    /* ONLY AGENTS HAVE TRANSITIONS */
     .agent { 
       position: absolute; transition: left 2s ease-in-out, top 2s ease-in-out, transform 0.3s; 
-      transform-origin: bottom center; z-index: 10;
+      display: flex; align-items: center; justify-content: center; 
+      font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center;
     }
 
-    /* POMNI: Jester Hat and Red/Blue Outfit */
-    #pomni { width: 50px; height: 60px; background: linear-gradient(to right, #f00 50%, #00f 50%); border-radius: 5px 5px 0 0; }
-    #pomni::before { content: '^^'; position: absolute; top: -15px; left: 0; width: 100%; color: white; font-size: 20px; text-align: center; }
-
-    /* CAINE: Giant Teeth and Red Suit */
-    #caine { width: 70px; height: 70px; background: #c00; border: 4px solid #fff; border-radius: 10px; }
-    #caine::after { content: '🦷🦷'; position: absolute; top: 10px; left: 5px; font-size: 25px; }
-
-    /* JAX: Purple Bunny Ears */
-    #jax { width: 40px; height: 80px; background: #a020f0; border-radius: 10px 10px 0 0; }
-    #jax::before { content: 'V'; position: absolute; top: -30px; left: 0; width: 100%; color: #a020f0; font-size: 40px; font-weight: bold; text-align: center; }
-
-    /* KINGER: Cape and Eyes */
-    #kinger { width: 50px; height: 90px; background: #8B4513; border: 5px solid #FFD700; border-radius: 20px 20px 0 0; }
-    #kinger::after { content: '👀'; position: absolute; top: 10px; left: 5px; font-size: 30px; }
-
-    /* GANGLE: Ribbon Body */
-    #gangle { width: 30px; height: 70px; background: pink; border-radius: 50% 50% 0 0; border: 2px solid red; }
-
-    /* BUBBLE: Soap Bubble */
-    #bubble { width: 40px; height: 40px; background: rgba(0, 255, 255, 0.4); border: 2px solid white; border-radius: 50%; }
-
-    /* RAGATHA: Ragdoll Dress */
-    #ragatha { width: 55px; height: 70px; background: #b22222; border-bottom: 10px solid blue; border-radius: 10px 10px 0 0; }
-
-    /* ZOOBLE: Abstract Shape */
-    #zooble { width: 50px; height: 50px; background: #ff4500; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); border: 2px dashed yellow; }
-
-    @keyframes walkBob { 0%, 100% { margin-top: 0px; } 50% { margin-top: -15px; } }
+    @keyframes walkBob { 0%, 100% { margin-top: 0px; } 50% { margin-top: -12px; } }
     .walking { animation: walkBob 0.4s infinite; }
 
-    #chat-container { position: fixed; bottom: 15px; left: 15px; right: 15px; height: 110px; background: rgba(0,0,0,0.95); border: 3px solid #ffd700; padding: 10px; color: #ffd700; border-radius: 15px; z-index: 9999; }
+    #chat-container { 
+      position: fixed; bottom: 15px; left: 15px; right: 15px; height: 110px; 
+      background: rgba(0, 0, 0, 0.95); border: 3px solid #ffd700; padding: 10px; 
+      font-size: 13px; z-index: 9999; color: #ffd700; overflow: hidden; border-radius: 15px;
+    }
     #messages { display: flex; flex-direction: column-reverse; }
   </style>
 </head>
 <body>
   <div id="tent-wall">
-    <div class="center-pole"></div><div class="spiral"></div>
-    <div style="position: absolute; left: 5%; top: 38%; width: 180px; height: 180px; border: 22px solid #0f0; border-radius: 50%; z-index: -5;"></div>
-    <div style="position: absolute; right: 18%; top: 22%; width: 70px; height: 70px; border: 12px solid #0f0; border-radius: 50%; z-index: -5;"></div>
+    <div class="sky-portal"></div>
+    <div class="center-pole"></div>
+    <div class="spiral"></div>
+    
+    <div class="deco-hoop huge-hoop-left"></div>
+    <div class="deco-hoop mid-hoop-right"></div>
+    <div class="deco-hoop small-hoop-right"></div>
+    <div class="deco-hoop zipper-halo"></div>
+
+    <div class="block-stack" style="left: 18%; top: 20%;">
+      <div class="mini-block" style="background: #f00;"></div>
+      <div class="mini-block" style="background: #00f;"></div>
+      <div class="mini-block" style="background: #ff0;"></div>
+    </div>
+
+    <div class="block-stack" style="right: 5%; top: 35%;">
+      <div class="mini-block" style="background: #0f0;"></div>
+      <div class="mini-block" style="background: #ff0;"></div>
+      <div class="mini-block" style="background: #f00;"></div>
+    </div>
+
+    <div class="rainbow" style="left: 28%;"></div>
+    <div class="rainbow" style="right: 28%;"></div>
+    <div class="giant-star"></div>
+    
+    <div class="pipe" style="position: absolute; top: 115px; left: 38%; width: 280px; height: 35px; background: linear-gradient(90deg, #f00, #ff0, #00f, #0f0); border: 4px solid #000; border-radius: 20px; transform: rotate(-5deg); z-index: -2;"></div>
   </div>
+
   <div id="floor"></div>
   
   <div id="stage">
-    <div id="pomni" class="agent"></div>
-    <div id="caine" class="agent"></div>
-    <div id="jax" class="agent"></div>
-    <div id="ragatha" class="agent"></div>
-    <div id="gangle" class="agent"></div>
-    <div id="zooble" class="agent"></div>
-    <div id="kinger" class="agent"></div>
-    <div id="bubble" class="agent"></div>
+    <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff;">POMNI</div>
+    <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff;">CAINE</div>
+    <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff;">JAX</div>
+    <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff;">Ragatha</div>
+    <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000;">GANGLE</div>
+    <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff;">Zooble</div>
+    <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000;">Kinger</div>
+    <div id="bubble" class="agent" style="width: 30px; height: 30px; background: #0ff; border-radius: 50%; border: 1px solid #fff; color: #000;">Bubble</div>
   </div>
 
   <div id="chat-container">
-    <div id="messages"><div>[SYSTEM]: Characters upgraded to Digital Avatars.</div></div>
+    <div id="messages"><div>[SYSTEM]: Motion locked. Everything is still.</div></div>
   </div>
 
   <script>
     const cast = [
-      { el: document.getElementById('pomni'), name: "POMNI" },
-      { el: document.getElementById('caine'), name: "CAINE" },
-      { el: document.getElementById('jax'), name: "JAX" },
-      { el: document.getElementById('ragatha'), name: "Ragatha" },
-      { el: document.getElementById('gangle'), name: "Gangle" },
-      { el: document.getElementById('zooble'), name: "Zooble" },
-      { el: document.getElementById('kinger'), name: "Kinger" },
-      { el: document.getElementById('bubble'), name: "Bubble" }
+      { el: document.getElementById('pomni'), name: "POMNI", color: "#ff4d4d" },
+      { el: document.getElementById('caine'), name: "CAINE", color: "red" },
+      { el: document.getElementById('jax'), name: "JAX", color: "#d1a3ff" },
+      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#ff4d4d" },
+      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", mood: "Happy" },
+      { el: document.getElementById('zooble'), name: "Zooble", color: "#ff4500" },
+      { el: document.getElementById('kinger'), name: "Kinger", color: "#FFD700" },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan" }
     ];
 
     function aiBrain(agent) {
       const nextX = 50 + Math.random() * (window.innerWidth - 150);
-      const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.2); 
+      const nextY = (window.innerHeight * 0.63) + Math.random() * (window.innerHeight * 0.2); 
       agent.el.classList.add('walking');
       agent.el.style.left = nextX + 'px';
       agent.el.style.top = nextY + 'px';
-      const scale = 0.5 + ((nextY - (window.innerHeight * 0.6)) / (window.innerHeight * 0.2)) * 0.5;
+      const scale = 0.6 + ((nextY - (window.innerHeight * 0.6)) / (window.innerHeight * 0.2)) * 0.4;
       agent.el.style.transform = `scale(${scale})`;
       agent.el.style.zIndex = Math.floor(nextY);
       setTimeout(() => { agent.el.classList.remove('walking'); }, 2000);
