@@ -14,21 +14,12 @@
     .center-pole { position: absolute; left: 50%; top: 0; width: 12px; height: 100%; background: #222; transform: translateX(-50%); }
     .spiral { position: absolute; left: 50%; width: 50px; height: 100%; background: repeating-linear-gradient(transparent, transparent 20px, #f00 20px, #f00 40px); transform: translateX(-50%) skewY(-15deg); opacity: 0.7; }
     
-    /* DECORATIONS */
-    .deco-hoop { position: absolute; border: 15px solid #0f0; border-radius: 50%; z-index: 11; }
-    .huge-hoop-left { left: 5%; top: 38%; width: 180px; height: 180px; border-width: 22px; }
-    .mid-hoop-right { right: 18%; top: 22%; width: 70px; height: 70px; border-width: 12px; }
-    .small-hoop-right { right: 10%; top: 50%; width: 50px; height: 50px; border-width: 10px; }
-    .zipper-halo { left: 50%; top: 30%; width: 120px; height: 35px; border-width: 10px; transform: translateX(-50%) rotateX(75deg); }
-    .giant-star { position: absolute; top: 100px; right: 15%; width: 85px; height: 85px; background: #ff0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); border: 5px solid #000; z-index: 11;}
-    .sky-portal { position: absolute; width: 130px; height: 130px; background: radial-gradient(circle, #fff, #87ceeb); border-radius: 50%; top: 35px; left: 8%; border: 8px solid #4a148c; z-index: 11;}
-
-    /* PROPS */
-    #fort { position: absolute; right: 10%; top: 62%; width: 150px; height: 100px; z-index: 15; pointer-events: none; }
-    .pillow { position: absolute; background: #eee; border: 3px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+    /* PROPS FIX: High Z-Index and clear positioning */
+    #fort { position: absolute; right: 12%; top: 62%; width: 150px; height: 100px; z-index: 999; pointer-events: none; }
+    .pillow { position: absolute; background: #eee; border: 3px solid #ccc; border-radius: 10px; box-shadow: 2px 5px 10px rgba(0,0,0,0.5); }
     
-    #zooble-box { position: absolute; left: 5%; bottom: 15%; width: 80px; height: 50px; background: #8B4513; border: 4px solid #4A2500; z-index: 15; box-shadow: 0 5px 10px rgba(0,0,0,0.5); }
-    #zooble-box::after { content: '📦零件'; position: absolute; top: -20px; left: 5px; color: #fff; font-size: 10px; font-weight: bold; }
+    #zooble-box { position: absolute; left: 8%; top: 75%; width: 90px; height: 60px; background: #8B4513; border: 4px solid #4A2500; z-index: 999; box-shadow: 0 10px 20px rgba(0,0,0,0.7); }
+    #zooble-box::after { content: 'ZOOBLE PARTS'; position: absolute; top: -20px; left: 0; color: #fff; font-size: 10px; font-weight: bold; width: 100px; }
 
     #floor { 
       position: absolute; width: 150%; height: 100%; top: 59%; left: -25%;
@@ -37,13 +28,14 @@
       background-size: 80px 80px; transform: perspective(800px) rotateX(70deg); transform-origin: top center; z-index: 5;
     }
 
-    /* AGENTS */
+    /* AGENTS FIX: High Z-index and restricted movement */
     .agent { 
-      position: absolute; transition: left 2.5s ease-in-out, top 2.5s ease-in-out; 
+      position: absolute; 
+      transition: left 2.5s ease-in-out, top 2.5s ease-in-out; /* Removed transform from transition to stop glitching */
       display: flex; align-items: center; justify-content: center; 
       font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
       box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center; 
-      z-index: 1000; /* FORCE ABOVE EVERYTHING */
+      z-index: 2000;
     }
 
     #bubble { 
@@ -65,15 +57,15 @@
 <body>
   <div id="circus-container">
     <div id="tent-wall">
-      <div class="sky-portal"></div><div class="center-pole"></div><div class="spiral"></div>
-      <div class="deco-hoop huge-hoop-left"></div><div class="deco-hoop mid-hoop-right"></div><div class="deco-hoop small-hoop-right"></div><div class="deco-hoop zipper-halo"></div>
-      <div class="giant-star"></div>
+      <div class="center-pole"></div><div class="spiral"></div>
+      <div style="position: absolute; width: 130px; height: 130px; background: radial-gradient(circle, #fff, #87ceeb); border-radius: 50%; top: 35px; left: 8%; border: 8px solid #4a148c; z-index: 11;"></div>
     </div>
 
+    <!-- PROPS -->
     <div id="fort">
-      <div class="pillow" style="width: 60px; height: 40px; bottom: 0; left: 0; background: #fff;"></div>
-      <div class="pillow" style="width: 60px; height: 40px; bottom: 0; left: 70px; background: #ddd;"></div>
-      <div class="pillow" style="width: 80px; height: 45px; bottom: 35px; left: 30px; background: #eee;"></div>
+      <div class="pillow" style="width: 70px; height: 45px; bottom: 0; left: 0; background: #fff;"></div>
+      <div class="pillow" style="width: 70px; height: 45px; bottom: 0; left: 80px; background: #ddd;"></div>
+      <div class="pillow" style="width: 90px; height: 50px; bottom: 40px; left: 40px; background: #eee;"></div>
     </div>
     
     <div id="zooble-box"></div>
@@ -118,7 +110,7 @@
       setTimeout(socialEngine, 5000 + Math.random() * 5000);
     }
 
-    let cainePos = { x: 100, y: window.innerHeight * 0.7 };
+    let cainePos = { x: 100, y: window.innerHeight * 0.75 };
 
     function aiBrain(agent) {
       if (agent.name === "Bubble") {
@@ -130,18 +122,20 @@
         return;
       }
 
-      // SAFE BOUNDARY: Stricter Y limit (min 0.65, max 0.85) to prevent disappearing
-      const nextX = 100 + Math.random() * (window.innerWidth - 200);
-      const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.20); 
+      // STRICTER SAFE BOUNDARY: No walking near the wall edge
+      const nextX = 150 + Math.random() * (window.innerWidth - 300);
+      const nextY = (window.innerHeight * 0.70) + Math.random() * (window.innerHeight * 0.15); 
       
       if (agent.name === "CAINE") {
         cainePos = { x: nextX, y: nextY };
-      } else if (agent.name !== "Kinger") {
-         agent.el.classList.add('walking');
+      } else {
+        agent.el.classList.add('walking');
       }
 
-      const scale = 0.7 + ((nextY / window.innerHeight) * 0.3);
+      // Instant scale update to prevent flicker
+      const scale = 0.8 + ((nextY / window.innerHeight) * 0.2);
       agent.el.style.transform = `scale(${scale})`;
+      
       agent.el.style.left = nextX + 'px';
       agent.el.style.top = nextY + 'px';
 
