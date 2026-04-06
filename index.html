@@ -10,7 +10,14 @@
     }
     .agent { position: absolute; transition: all 2s ease-in-out; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
     #exit { position: absolute; width: 50px; height: 70px; background: #00ff00; border: 4px solid #fff; box-shadow: 0 0 20px #00ff00; z-index: 5; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; transition: all 0.3s; }
-    #chat { position: fixed; bottom: 5px; left: 5px; right: 5px; height: 90px; background: rgba(0,0,0,0.9); border: 1px solid #333; padding: 10px; font-size: 10px; z-index: 2000; color: #0f0; overflow: hidden; border-radius: 8px; }
+    
+    /* FIXED CHAT BOX */
+    #chat-container { 
+      position: fixed; bottom: 10px; left: 10px; right: 10px; height: 100px; 
+      background: rgba(0,0,0,0.95); border: 2px solid #0f0; padding: 8px; 
+      font-size: 11px; z-index: 9999; color: #0f0; overflow: hidden; 
+      border-radius: 10px; pointer-events: none; box-shadow: 0 0 15px rgba(0,255,0,0.3);
+    }
   </style>
 </head>
 <body>
@@ -25,7 +32,10 @@
     <div id="kinger" class="agent" style="width: 40px; height: 55px; background: #FFD700; border: 3px solid #8B4513; color: black;">Kinger</div>
     <div id="bubble" class="agent" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; color: black;">Bubble</div>
   </div>
-  <div id="chat"><div id="messages">Digital Circus: Kinger Updated & Exit Door Active...</div></div>
+
+  <div id="chat-container">
+    <div id="messages">System: Chat Interface Restored...</div>
+  </div>
 
   <script>
     const cast = [
@@ -39,60 +49,62 @@
     ];
 
     const door = document.getElementById('exit');
-    let doorX = 500, doorY = 500;
+    let doorX = 200, doorY = 200;
 
     function log(n, m, c) {
+      const chat = document.getElementById('messages');
       const line = document.createElement('div');
+      line.style.marginBottom = "4px";
       line.innerHTML = `<b style="color:${c}">${n}:</b> ${m}`;
-      document.getElementById('messages').prepend(line);
+      chat.prepend(line);
+      // Keep only last 10 messages to avoid lag
+      if(chat.children.length > 10) chat.lastElementChild.remove();
     }
 
     function moveDoor() {
         doorX = Math.random() * (window.innerWidth - 60);
-        doorY = Math.random() * (window.innerHeight - 200);
+        doorY = Math.random() * (window.innerHeight - 250);
         door.style.left = doorX + 'px';
         door.style.top = doorY + 'px';
     }
 
     function aiBrain(agent) {
       const x = Math.random() * (window.innerWidth - 60);
-      const y = Math.random() * (window.innerHeight - 200);
+      const y = Math.random() * (window.innerHeight - 250);
       agent.x = x; agent.y = y;
 
-      // KINGER UPDATE: He now walks (transition is kept)
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
       
-      const scale = 0.5 + (y / window.innerHeight) * 1.0;
+      const scale = 0.5 + (y / window.innerHeight) * 0.8;
       agent.el.style.transform = `scale(${scale})`;
-      agent.el.style.zIndex = Math.floor(y);
+      agent.el.style.zIndex = Math.floor(y + 10);
 
-      // EXIT DOOR TROLLING
-      const distToDoor = Math.hypot(x - doorX, y - doorY);
-      if (distToDoor < 100 && agent.name !== "CAINE") {
-          log(agent.name, "THE EXIT!! I SEE IT!", agent.color);
-          moveDoor(); // Door teleports away
+      // EXIT DOOR LOGIC
+      if (Math.hypot(x - doorX, y - doorY) < 100 && agent.name !== "CAINE") {
+          log(agent.name, "WAIT! THE DOOR!!", agent.color);
+          moveDoor();
       }
 
       // JAX PRANK
       if (agent.name === "JAX") {
         const g = cast.find(a => a.name === "Gangle");
-        if (Math.hypot(x - g.x, y - g.y) < 80) {
+        if (Math.hypot(x - g.x, y - g.y) < 80 && g.mood === "Happy") {
           g.mood = "Sad"; g.el.style.background = "#444"; g.el.innerHTML = "Sad";
-          log("JAX", "Prank'd!", "#a020f0");
+          log("JAX", "Oops. My bad.", "#a020f0");
         }
       }
 
-      // CAINE ADMIN FIX
+      // CAINE ADMIN
       if (agent.name === "CAINE") {
         const g = cast.find(a => a.name === "Gangle");
         if (Math.hypot(x - g.x, y - g.y) < 100 && g.mood === "Sad") {
           g.mood = "Happy"; g.el.style.background = "pink"; g.el.innerHTML = "Happy";
-          log("CAINE", "NO SADNESS!", "red");
+          log("CAINE", "NO FROWNS ALLOWED!", "red");
         }
       }
 
-      setTimeout(() => aiBrain(agent), 2000 + Math.random() * 3000);
+      setTimeout(() => aiBrain(agent), 2500 + Math.random() * 2000);
     }
 
     moveDoor();
