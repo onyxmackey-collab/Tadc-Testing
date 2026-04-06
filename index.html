@@ -31,9 +31,11 @@
 
     .agent { 
       position: absolute; 
+      /* FORCE START ON FLOOR */
+      top: 75vh; left: 50vw;
       transition: left 2.5s ease-in-out, top 2.5s ease-in-out; 
       display: flex; align-items: center; justify-content: center; 
-      font-weight: bold; border-radius: 5px; font-size: 10px; text-align: center; 
+      font-weight: bold; font-size: 10px; text-align: center; 
       box-shadow: 0 10px 20px rgba(0,0,0,0.8); transform-origin: bottom center; 
       z-index: 1000; 
     }
@@ -60,18 +62,19 @@
       <div class="sky-portal"></div><div class="center-pole"></div><div class="spiral"></div>
       <div class="deco-hoop huge-hoop-left"></div><div class="deco-hoop mid-hoop-right"></div><div class="deco-hoop small-hoop-right"></div><div class="deco-hoop zipper-halo"></div>
       <div class="giant-star"></div>
-      <div class="pastel-rainbow"></div>
     </div>
     <div id="floor"></div>
     <div id="stage">
-      <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff; border-radius: 50%; left: 60%; top: 75%;">POMNI</div>
-      <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff; left: 50%; top: 70%;"><div class="hovering-wrap">CAINE</div></div>
-      <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff; left: 80%; top: 80%;">JAX</div>
-      <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff; left: 40%; top: 85%;">Ragatha</div>
-      <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000; left: 60%; top: 75%;">GANGLE</div>
-      <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff; left: 10%; top: 80%;">Zooble</div>
-      <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000; left: 70%; top: 85%;">Kinger</div>
-      <div id="bubble" class="agent" style="width: 30px; height: 30px; border-radius: 50%; color: #000; left: 45%; top: 65%;">Bubble</div>
+      <!-- POMNI REDEFINED WITH EXPLICIT BORDER RADIUS AND Z-INDEX -->
+      <div id="pomni" class="agent" style="width: 45px; height: 45px; background: linear-gradient(45deg, #f00 50%, #00f 50%); color: #fff; border: 2px solid #fff; border-radius: 5px; z-index: 2000;">POMNI</div>
+      
+      <div id="caine" class="agent" style="width: 65px; height: 65px; background: #f00; border: 3px solid #fff; color: #fff; border-radius: 5px;"><div class="hovering-wrap">CAINE</div></div>
+      <div id="jax" class="agent" style="width: 45px; height: 45px; background: #a020f0; color: #fff; border-radius: 5px;">JAX</div>
+      <div id="ragatha" class="agent" style="width: 50px; height: 50px; background: #b22222; border: 2px solid blue; color: #fff; border-radius: 5px;">Ragatha</div>
+      <div id="gangle" class="agent" style="width: 40px; height: 40px; background: pink; border-radius: 50%; color: #000;">GANGLE</div>
+      <div id="zooble" class="agent" style="width: 45px; height: 45px; background: #ff4500; border: 3px dashed yellow; color: #fff; border-radius: 5px;">Zooble</div>
+      <div id="kinger" class="agent" style="width: 45px; height: 60px; background: #FFD700; border: 3px solid #8B4513; color: #000; border-radius: 5px;">Kinger</div>
+      <div id="bubble" class="agent" style="width: 30px; height: 30px; border-radius: 50%; color: #000;">Bubble</div>
     </div>
   </div>
   <div id="chat-container"><div id="messages"></div></div>
@@ -103,7 +106,7 @@
       setTimeout(socialEngine, 4000 + Math.random() * 4000);
     }
 
-    let cainePos = { x: window.innerWidth / 2, y: window.innerHeight * 0.7 };
+    let cainePos = { x: window.innerWidth / 2, y: window.innerHeight * 0.75 };
 
     function aiBrain(agent) {
       const move = () => {
@@ -118,8 +121,9 @@
           return;
         }
 
+        // Target the floor area specifically
         const nextX = 50 + Math.random() * (window.innerWidth - 100);
-        const nextY = (window.innerHeight * 0.65) + Math.random() * (window.innerHeight * 0.25); 
+        const nextY = (window.innerHeight * 0.70) + Math.random() * (window.innerHeight * 0.20); 
         
         if (agent.name === "CAINE") {
           cainePos = { x: nextX, y: nextY };
@@ -127,20 +131,25 @@
           agent.el.classList.add('walking');
         }
 
-        const scale = 0.7 + ((nextY / window.innerHeight) * 0.3);
+        const scale = 0.8 + ((nextY / window.innerHeight) * 0.2);
         agent.el.style.transform = `scale(${scale})`;
         agent.el.style.left = nextX + 'px';
         agent.el.style.top = nextY + 'px';
 
         setTimeout(() => { agent.el.classList.remove('walking'); }, 2500);
-        setTimeout(move, 5000 + Math.random() * 4000);
+        setTimeout(move, 4000 + Math.random() * 3000);
       };
 
       move();
     }
 
+    // ENSURE POMNI IS ON STAGE IMMEDIATELY
     window.onload = () => {
-      cast.forEach(aiBrain);
+      cast.forEach(agent => {
+        agent.el.style.left = (Math.random() * 80 + 10) + 'vw';
+        agent.el.style.top = '80vh';
+        aiBrain(agent);
+      });
       socialEngine();
     };
   </script>
