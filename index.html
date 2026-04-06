@@ -1,68 +1,69 @@
 <!DOCTYPE html>
 <html>
-<body style="background: #111; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; color: white;">
+<body id="world" style="background: #111; margin: 0; overflow: hidden; font-family: 'Courier New', monospace; color: white; transition: background 3s;">
 
-  <!-- THE CIRCUS CAST -->
-  <div id="caine" style="width: 60px; height: 60px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 100; transition: all 1s ease-in-out;">CAINE</div>
-  <div id="bubble" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; position: absolute; display: flex; align-items: center; justify-content: center; color: black; font-size: 8px; z-index: 90; transition: all 2s ease-in-out;">Bubble</div>
-  <div id="jax" style="width: 40px; height: 40px; background: #a020f0; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 95; transition: all 1.5s ease-in-out;">JAX</div>
-  <div id="ragatha" style="width: 45px; height: 45px; background: #b22222; border: 2px solid blue; position: absolute; z-index: 90; transition: all 1.8s ease-in-out; display: flex; align-items: center; justify-content: center; font-size: 10px;">Ragatha</div>
-  <div id="gangle" style="width: 25px; height: 25px; background: pink; border-radius: 20%; position: absolute; z-index: 85; transition: all 2.5s ease-in-out; display: flex; align-items: center; justify-content: center; color: black; font-size: 8px;">Gangle</div>
-  <div id="kinger" style="width: 35px; height: 50px; background: #ddd; border: 3px solid purple; position: absolute; z-index: 80; transition: all 0.5s ease-in-out; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold;">Kinger</div>
+  <!-- THE CIRCUS CAST (With added 3D Scale) -->
+  <div id="caine" style="width: 60px; height: 60px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 1000; transition: all 1s;">CAINE</div>
+  <div id="bubble" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; position: absolute; z-index: 500; transition: all 2s;"></div>
+  <div id="jax" style="width: 40px; height: 40px; background: #a020f0; position: absolute; z-index: 600; transition: all 1.5s;">JAX</div>
+  <div id="kinger" style="width: 35px; height: 50px; background: white; border: 3px solid purple; position: absolute; z-index: 400; transition: all 0.5s;">!</div>
 
-  <!-- THE CHAT -->
-  <div id="chat" style="position: fixed; bottom: 10px; left: 10px; right: 10px; height: 100px; background: rgba(0,0,0,0.9); border: 1px solid #444; padding: 10px; font-size: 10px; overflow: hidden; z-index: 200; color: #0f0;">
-    <div id="messages">Welcome to the Amazing Digital Circus!</div>
+  <div id="chat" style="position: fixed; bottom: 10px; left: 10px; right: 10px; height: 80px; background: rgba(0,0,0,0.9); border: 1px solid #444; padding: 10px; font-size: 10px; z-index: 2000; color: #0f0; overflow: hidden;">
+    <div id="messages">System: Dimension & Sleep Cycles Loaded...</div>
   </div>
 
   <script>
+    let isBedtime = false;
     const cast = [
-      { el: document.getElementById('caine'), name: "CAINE", color: "red", power: 100, quotes: ["I AM THE MASTER!", "WACKY STUFF!", "NO EXIT!"] },
-      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", power: 1, quotes: ["Look at me!", "Pop!", "Master Caine?"] },
-      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", power: 50, quotes: ["Prank time.", "Don't touch me.", "Classic."] },
-      { el: document.getElementById('ragatha'), name: "Ragatha", color: "#b22222", power: 40, quotes: ["Is everyone okay?", "Oh dear.", "Keep it together."] },
-      { el: document.getElementById('gangle'), name: "Gangle", color: "pink", power: 10, quotes: ["My mask!", "Sob...", "I'm happy!"] },
-      { el: document.getElementById('kinger'), name: "Kinger", color: "white", power: 30, quotes: ["HOO HAA!", "Did someone say insect collection?", "AHH!"] }
+      { el: document.getElementById('caine'), name: "CAINE", color: "red", power: 100 },
+      { el: document.getElementById('bubble'), name: "Bubble", color: "cyan", power: 1 },
+      { el: document.getElementById('jax'), name: "JAX", color: "#a020f0", power: 50 },
+      { el: document.getElementById('kinger'), name: "Kinger", color: "white", power: 30 }
     ];
 
     function log(name, msg, color) {
-      const chat = document.getElementById('messages');
       const line = document.createElement('div');
       line.innerHTML = `<b style="color:${color}">${name}:</b> ${msg}`;
-      chat.prepend(line);
+      document.getElementById('messages').prepend(line);
     }
 
+    // BEDTIME CYCLE
+    setInterval(() => {
+      isBedtime = !isBedtime;
+      document.getElementById('world').style.background = isBedtime ? "#000022" : "#111";
+      log("SYSTEM", isBedtime ? "CAINE: BEDTIME, EVERYONE!" : "CAINE: WAKE UP!", "red");
+    }, 15000);
+
     function aiBrain(agent) {
-      // Free Will: Decide where to move
-      const x = Math.random() * (window.innerWidth - 50);
-      const y = Math.random() * (window.innerHeight - 180);
-      agent.x = x; agent.y = y;
+      if (isBedtime && agent.name !== "CAINE") {
+        setTimeout(() => aiBrain(agent), 2000);
+        return; 
+      }
+
+      // DIMENSION: Randomly pick a "depth" (Z)
+      const depth = Math.random(); // 0 is far away, 1 is close
+      const scale = 0.5 + (depth * 1.5); // Shrink to 50% or grow to 150%
+      
+      const x = Math.random() * (window.innerWidth - 60);
+      const y = Math.random() * (window.innerHeight - 200);
+
+      agent.el.style.transform = `scale(${scale})`;
+      agent.el.style.zIndex = Math.floor(depth * 1000);
       agent.el.style.left = x + 'px';
       agent.el.style.top = y + 'px';
+      agent.el.style.opacity = 0.3 + (depth * 0.7); // Faded when far away
 
-      // Power Check: If Caine is nearby, he forces them to build HIS way
-      const caine = cast[0];
-      const dist = Math.hypot(x - caine.x, y - caine.y);
-      
-      // Building Logic
-      if (Math.random() > 0.5) {
+      // Building with dimension
+      if (Math.random() > 0.6) {
         const b = document.createElement('div');
-        b.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:10px; height:10px; opacity:0.5; transition: 2s;`;
-        b.style.background = (dist < 150) ? "red" : agent.color;
+        b.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:${10*scale}px; height:${10*scale}px; background:${agent.color}; z-index:${Math.floor(depth*900)}; opacity:0.4;`;
         document.body.appendChild(b);
         setTimeout(() => b.remove(), 10000);
       }
 
-      // Chat Logic
-      if (Math.random() > 0.7) {
-        const msg = (dist < 100 && agent.name !== "CAINE") ? "YES, CAINE!" : agent.quotes[Math.floor(Math.random()*agent.quotes.length)];
-        log(agent.name, msg, agent.color);
-      }
-
-      setTimeout(() => aiBrain(agent), 1000 + Math.random() * 3000);
+      setTimeout(() => aiBrain(agent), 1500 + Math.random() * 3000);
     }
 
-    // Start all AI Brains
     cast.forEach(agent => aiBrain(agent));
   </script>
 </body>
