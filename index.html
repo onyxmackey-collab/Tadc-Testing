@@ -1,42 +1,74 @@
 <!DOCTYPE html>
 <html>
-<body style="background: #111; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; overflow: hidden;">
+<body style="background: #111; margin: 0; overflow: hidden; font-family: 'Courier New', Courier, monospace; color: white;">
 
-  <!-- THE OVERLORD -->
-  <div id="caine" style="width: 100px; height: 100px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 10;">
-    CAINE
-  </div>
+  <!-- AGENT BODIES -->
+  <div id="caine" style="width: 60px; height: 60px; background: red; position: absolute; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 0 20px red; z-index: 100; border-radius: 5px;">CAINE</div>
+  <div id="bubble" style="width: 30px; height: 30px; background: cyan; border-radius: 50%; position: absolute; display: flex; align-items: center; justify-content: center; color: black; font-size: 8px; z-index: 90;">Bubble</div>
 
-  <!-- THE SUBORDINATE -->
-  <div id="bubble" style="width: 50px; height: 50px; background: cyan; border-radius: 50%; position: absolute; display: flex; align-items: center; justify-content: center; color: black; font-size: 10px; z-index: 5;">
-    Bubble
+  <!-- GROUP CHAT BOX -->
+  <div id="chat" style="position: fixed; bottom: 10px; left: 10px; right: 10px; height: 80px; background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 10px; font-size: 12px; overflow-y: hidden; z-index: 200; color: #0f0;">
+    <div id="messages">Initializing Digital Circus...</div>
   </div>
 
   <script>
-    const caine = document.getElementById('caine');
-    const bubble = document.getElementById('bubble');
+    const caineObj = { el: document.getElementById('caine'), x: 50, y: 50, vx: 2, vy: 2, name: "CAINE" };
+    const bubbleObj = { el: document.getElementById('bubble'), x: 200, y: 200, vx: 4, vy: 4, name: "Bubble" };
+    const chat = document.getElementById('messages');
 
-    const handleMove = (e) => {
-      const x = e.touches ? e.touches[0].pageX : e.pageX;
-      const y = e.touches ? e.touches[0].pageY : e.pageY;
+    function log(name, msg, color) {
+      const line = document.createElement('div');
+      line.innerHTML = `<b style="color:${color}">${name}:</b> ${msg}`;
+      chat.prepend(line); // Newest messages at the top
+    }
 
-      // Bubble follows your finger
-      bubble.style.left = (x - 25) + 'px';
-      bubble.style.top = (y - 25) + 'px';
-
-      // POWER LOGIC: Caine "glitches" toward Bubble
-      if (Math.random() > 0.90) {
-        caine.style.left = (x - 50 + (Math.random() * 40 - 20)) + 'px';
-        caine.style.top = (y - 50 + (Math.random() * 40 - 20)) + 'px';
-        
-        // Caine takes control of Bubble's color
-        bubble.style.background = 'red';
-        setTimeout(() => { bubble.style.background = 'cyan'; }, 300);
+    // RANDOM CHATTER LOGIC
+    setInterval(() => {
+      const dist = Math.hypot(caineObj.x - bubbleObj.x, caineObj.y - bubbleObj.y);
+      if (dist < 150) {
+        log("CAINE", "OBEY THE RULES, BUBBLE!", "red");
+        log("Bubble", "Yes, Master Caine...", "cyan");
+      } else {
+        const quotes = ["Everything is fine!", "Building more shapes...", "I love this circus!"];
+        log("Bubble", quotes[Math.floor(Math.random()*quotes.length)], "cyan");
       }
-    };
+    }, 4000);
 
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('touchmove', handleMove);
+    function moveAgent(agent) {
+      agent.x += agent.vx;
+      agent.y += agent.vy;
+
+      // Bounce off walls
+      if (agent.x < 0 || agent.x > window.innerWidth - 60) agent.vx *= -1;
+      if (agent.y < 0 || agent.y > window.innerHeight - 150) agent.vy *= -1;
+
+      agent.el.style.left = agent.x + 'px';
+      agent.el.style.top = agent.y + 'px';
+
+      // BUILDING LOGIC
+      if (Math.random() > 0.98) {
+        const block = document.createElement('div');
+        block.style.position = 'absolute';
+        block.style.left = agent.x + (agent === caineObj ? 20 : 10) + 'px';
+        block.style.top = agent.y + (agent === caineObj ? 20 : 10) + 'px';
+        block.style.width = '8px';
+        block.style.height = '8px';
+        
+        const dist = Math.hypot(caineObj.x - bubbleObj.x, caineObj.y - bubbleObj.y);
+        block.style.background = (agent === caineObj || dist < 150) ? 'red' : 'cyan';
+        
+        document.body.appendChild(block);
+        setTimeout(() => block.remove(), 8000);
+      }
+    }
+
+    function animate() {
+      moveAgent(caineObj);
+      moveAgent(bubbleObj);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
   </script>
 </body>
 </html>
