@@ -10,7 +10,7 @@
     }
 
     #room {
-      position: relative; width: 100%; height: 100%; 
+      position: relative; width: 100%; height: calc(100% - 80px); 
       background: linear-gradient(to bottom, #34495e 50%, #2c3e50 100%);
       box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
     }
@@ -33,18 +33,31 @@
       cursor: pointer;
     }
 
-    .heart {
-      position: absolute;
-      font-size: 36px;
-      color: #ff69b4;
-      pointer-events: none;
-      animation: floatUp 1.8s forwards;
-      z-index: 200;
+    #chat-container {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 80px; background: rgba(0, 0, 0, 0.9);
+      border-top: 3px solid #ffd700; padding: 10px;
+      display: flex; align-items: center; gap: 10px;
+      z-index: 9999;
     }
 
-    @keyframes floatUp {
-      0% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(-140px); opacity: 0; }
+    #message-input {
+      flex: 1; padding: 12px; border: none; border-radius: 8px;
+      background: #333; color: white; font-size: 16px;
+    }
+
+    #send-btn {
+      padding: 12px 20px; background: #ffd700; color: #000;
+      border: none; border-radius: 8px; font-weight: bold;
+      cursor: pointer;
+    }
+
+    #messages {
+      position: fixed; bottom: 90px; left: 15px; right: 15px;
+      height: 140px; background: rgba(0,0,0,0.7);
+      border: 2px solid #ffd700; border-radius: 8px;
+      padding: 8px; overflow-y: auto; color: #ffd700;
+      font-size: 14px; z-index: 9998;
     }
   </style>
 </head>
@@ -55,6 +68,13 @@
     <div id="character">❤️</div>
   </div>
 
+  <div id="messages"></div>
+
+  <div id="chat-container">
+    <input type="text" id="message-input" placeholder="Type a message to the character...">
+    <button id="send-btn">Send</button>
+  </div>
+
   <script>
     const character = document.getElementById('character');
     let isFollowing = false;
@@ -62,10 +82,10 @@
 
     // Wandering behavior
     function wander() {
-      if (isFollowing) return; // Don't wander while being followed
+      if (isFollowing) return;
 
       const maxX = window.innerWidth - 100;
-      const maxY = window.innerHeight * 0.6;
+      const maxY = window.innerHeight * 0.55;
 
       const newX = 50 + Math.random() * (maxX - 100);
       const newY = 100 + Math.random() * (maxY - 150);
@@ -85,55 +105,60 @@
       character.style.top = targetY + 'px';
     }
 
-    // Pet reaction (only on tap/click)
-    function petReaction(e) {
-      const rect = character.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.textContent = '❤️';
-      heart.style.left = (x - 18) + 'px';
-      heart.style.top = (y - 40) + 'px';
-      document.body.appendChild(heart);
-
-      setTimeout(() => heart.remove(), 2000);
-
-      // Happy bounce
-      character.style.transform = 'scale(1.35)';
-      setTimeout(() => character.style.transform = 'scale(1)', 250);
+    function addMessage(text, isUser = false) {
+      const messagesDiv = document.getElementById('messages');
+      const msg = document.createElement('div');
+      msg.style.margin = '4px 0';
+      msg.innerHTML = isUser 
+        ? `<strong>You:</strong> ${text}` 
+        : `<strong>Character:</strong> ${text}`;
+      messagesDiv.appendChild(msg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    // Mouse support
+    // For now: simple echo (we can add real AI later if you want)
+    function sendMessage() {
+      const input = document.getElementById('message-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, true);
+      input.value = '';
+
+      // Placeholder reply - tell me if you want real OpenAI integration
+      setTimeout(() => {
+        addMessage("...");  // Empty for now
+      }, 600);
+    }
+
+    // Mouse / Touch controls
     document.addEventListener('mousemove', (e) => {
       if (isFollowing) moveCharacter(e.clientX, e.clientY);
     });
 
-    // Touch support
     document.addEventListener('touchmove', (e) => {
       if (isFollowing && e.touches.length > 0) {
-        const touch = e.touches[0];
-        moveCharacter(touch.clientX, touch.clientY);
+        moveCharacter(e.touches[0].clientX, e.touches[0].clientY);
       }
     });
 
-    // Start / stop following
     document.addEventListener('mousedown', () => { isFollowing = true; clearTimeout(wanderTimeout); });
     document.addEventListener('mouseup', () => { isFollowing = false; wander(); });
 
     document.addEventListener('touchstart', () => { isFollowing = true; clearTimeout(wanderTimeout); });
     document.addEventListener('touchend', () => { isFollowing = false; wander(); });
 
-    // Click/tap to pet
-    character.addEventListener('click', petReaction);
-    character.addEventListener('touchend', petReaction);
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    document.getElementById('message-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
 
     // Start
     window.onload = () => {
       character.style.left = (window.innerWidth / 2 - 40) + 'px';
       character.style.top = (window.innerHeight / 2 - 40) + 'px';
       wander();
+      addMessage("...");
     };
   </script>
 </body>
