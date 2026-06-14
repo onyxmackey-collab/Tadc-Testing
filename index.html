@@ -23,7 +23,7 @@
     #character {
       position: absolute; width: 80px; height: 80px;
       background: linear-gradient(45deg, #ff4d4d, #00aaff);
-      color: white; font-weight: bold; font-size: 14px;
+      color: white; font-weight: bold; font-size: 18px;
       display: flex; align-items: center; justify-content: center;
       border: 4px solid white; border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
@@ -59,12 +59,6 @@
       padding: 10px; overflow-y: auto; color: #ffd700;
       font-size: 14px; z-index: 9998;
     }
-
-    #api-key-input {
-      position: fixed; top: 10px; left: 10px; z-index: 10000;
-      background: rgba(0,0,0,0.8); padding: 8px; border-radius: 6px;
-      color: white; display: none;
-    }
   </style>
 </head>
 <body>
@@ -77,20 +71,14 @@
   <div id="messages"></div>
 
   <div id="chat-container">
-    <input type="text" id="message-input" placeholder="Talk to the character...">
+    <input type="text" id="message-input" placeholder="Talk to Pomni...">
     <button id="send-btn">Send</button>
-  </div>
-
-  <div id="api-key-input">
-    OpenAI Key: <input type="password" id="key-input" placeholder="sk-..." size="40">
-    <button onclick="saveKey()">Save</button>
   </div>
 
   <script>
     const character = document.getElementById('character');
     let isFollowing = false;
     let wanderTimeout = null;
-    let apiKey = '';
 
     // Wandering behavior
     function wander() {
@@ -123,43 +111,31 @@
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    async function sendMessage() {
+    // Simple but natural local responses (no API needed)
+    const thoughtfulResponses = [
+      "I'm really scared... everything feels so wrong here.",
+      "You're the only person who talks to me like this.",
+      "Do you think we'll ever get out?",
+      "This place is so confusing... but you're nice.",
+      "I keep having weird dreams about the real world.",
+      "What do you think this place really is?",
+      "Thank you for staying with me.",
+      "I feel a little better when you talk to me."
+    ];
+
+    function sendMessage() {
       const input = document.getElementById('message-input');
       const text = input.value.trim();
-      if (!text || !apiKey) return;
+      if (!text) return;
 
       addMessage(text, true);
       input.value = '';
 
-      addMessage("thinking...");
-
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              { role: "system", content: "You are Pomni, a scared but kind girl trapped in a strange digital circus world. Respond naturally, emotionally, and in character. Keep replies short." },
-              { role: "user", content: text }
-            ],
-            max_tokens: 150
-          })
-        });
-
-        const data = await res.json();
-        const reply = data.choices[0].message.content;
-        
-        // Remove "thinking..."
-        document.getElementById('messages').lastChild.remove();
+      // Natural reply
+      setTimeout(() => {
+        const reply = thoughtfulResponses[Math.floor(Math.random() * thoughtfulResponses.length)];
         addMessage(reply);
-      } catch (e) {
-        document.getElementById('messages').lastChild.remove();
-        addMessage("...I can't connect right now.");
-      }
+      }, 700);
     }
 
     // Mouse / Touch following
@@ -178,20 +154,12 @@
       if (e.key === 'Enter') sendMessage();
     });
 
-    function saveKey() {
-      apiKey = document.getElementById('key-input').value.trim();
-      if (apiKey) {
-        document.getElementById('api-key-input').style.display = 'none';
-        addMessage("Connected! Talk to me...");
-      }
-    }
-
     // Start
     window.onload = () => {
       character.style.left = (window.innerWidth / 2 - 40) + 'px';
       character.style.top = (window.innerHeight / 2 - 40) + 'px';
       wander();
-      document.getElementById('api-key-input').style.display = 'block';
+      addMessage("Hi... can you really see me?");
     };
   </script>
 </body>
