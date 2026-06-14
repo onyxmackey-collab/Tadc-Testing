@@ -29,49 +29,19 @@
       transition: left 2s ease-in-out, top 2s ease-in-out;
       z-index: 100;
     }
-
-    #chat-container {
-      position: fixed; bottom: 20px; left: 20px; right: 20px;
-      height: 140px; background: rgba(0, 0, 0, 0.9);
-      border: 3px solid #ffd700; border-radius: 12px;
-      padding: 10px; overflow-y: auto; color: #ffd700;
-      z-index: 9999;
-    }
-
-    #messages { display: flex; flex-direction: column-reverse; }
   </style>
 </head>
 <body>
 
   <div id="room">
     <div class="floor"></div>
-    <div id="character">POMNI</div>
-  </div>
-
-  <div id="chat-container">
-    <div id="messages"></div>
+    <div id="character"></div>
   </div>
 
   <script>
     const character = {
-      el: document.getElementById('character'),
-      name: "POMNI",
-      color: "#ff4d4d",
-      lines: [
-        "Is there an exit...?",
-        "I just want to go home.",
-        "This place feels wrong...",
-        "What should I do now?"
-      ]
+      el: document.getElementById('character')
     };
-
-    function log(message) {
-      const msgs = document.getElementById('messages');
-      const line = document.createElement('div');
-      line.innerHTML = `<span style="color:\( {character.color}; font-weight:bold;">[ \){character.name}]</span>: ${message}`;
-      msgs.prepend(line);
-      if (msgs.children.length > 8) msgs.lastElementChild.remove();
-    }
 
     // Character wanders around the room
     function wander() {
@@ -84,18 +54,13 @@
       character.el.style.left = newX + 'px';
       character.el.style.top = newY + 'px';
 
-      // Random dialogue
-      if (Math.random() > 0.6) {
-        log(character.lines[Math.floor(Math.random() * character.lines.length)]);
-      }
-
       setTimeout(wander, 3000 + Math.random() * 4000);
     }
 
-    // Click on character to interact
+    // Click on character (you can still interact this way for now)
     character.el.addEventListener('click', () => {
-      const replies = ["...Hello?", "You can see me?", "I'm scared...", "Will you help me?"];
-      log(replies[Math.floor(Math.random() * replies.length)]);
+      console.log("You clicked the character");
+      // You can expand this later
     });
 
     // Start everything
@@ -103,7 +68,6 @@
       character.el.style.left = '40%';
       character.el.style.top = '50%';
       wander();
-      log("Pomni appears in the room...");
     };
   </script>
 </body>
