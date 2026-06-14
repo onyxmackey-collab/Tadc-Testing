@@ -6,7 +6,7 @@
       height: 100%; width: 100%; margin: 0; padding: 0; 
       background: #2c3e50; font-family: sans-serif; 
       overflow: hidden; 
-      touch-action: none; /* Better touch support */
+      touch-action: none;
     }
 
     #room {
@@ -27,7 +27,7 @@
       display: flex; align-items: center; justify-content: center;
       border: 4px solid white; border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-      transition: transform 0.1s ease-out;
+      transition: left 2s ease-in-out, top 2s ease-in-out, transform 0.2s;
       z-index: 100;
       user-select: none;
       cursor: pointer;
@@ -35,16 +35,16 @@
 
     .heart {
       position: absolute;
-      font-size: 30px;
+      font-size: 36px;
       color: #ff69b4;
       pointer-events: none;
-      animation: floatUp 1.5s forwards;
+      animation: floatUp 1.8s forwards;
       z-index: 200;
     }
 
     @keyframes floatUp {
       0% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(-120px); opacity: 0; }
+      100% { transform: translateY(-140px); opacity: 0; }
     }
   </style>
 </head>
@@ -58,41 +58,51 @@
   <script>
     const character = document.getElementById('character');
     let isFollowing = false;
+    let wanderTimeout = null;
 
-    // Make character follow mouse / finger
+    // Wandering behavior
+    function wander() {
+      if (isFollowing) return; // Don't wander while being followed
+
+      const maxX = window.innerWidth - 100;
+      const maxY = window.innerHeight * 0.6;
+
+      const newX = 50 + Math.random() * (maxX - 100);
+      const newY = 100 + Math.random() * (maxY - 150);
+
+      character.style.left = newX + 'px';
+      character.style.top = newY + 'px';
+
+      wanderTimeout = setTimeout(wander, 2500 + Math.random() * 3500);
+    }
+
+    // Follow finger/mouse
     function moveCharacter(x, y) {
-      const rect = character.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-
-      // Gentle following with some lag
-      const targetX = x - rect.width / 2;
-      const targetY = y - rect.height / 2;
-
+      const targetX = x - 40;
+      const targetY = y - 40;
+      character.style.transition = 'left 0.1s linear, top 0.1s linear';
       character.style.left = targetX + 'px';
       character.style.top = targetY + 'px';
     }
 
-    // Pet reaction (click or tap)
+    // Pet reaction (only on tap/click)
     function petReaction(e) {
       const rect = character.getBoundingClientRect();
       const x = rect.left + rect.width / 2;
       const y = rect.top + rect.height / 2;
 
-      // Create floating heart
       const heart = document.createElement('div');
       heart.className = 'heart';
       heart.textContent = '❤️';
-      heart.style.left = (x - 15) + 'px';
-      heart.style.top = (y - 30) + 'px';
+      heart.style.left = (x - 18) + 'px';
+      heart.style.top = (y - 40) + 'px';
       document.body.appendChild(heart);
 
-      // Remove after animation
-      setTimeout(() => heart.remove(), 1600);
+      setTimeout(() => heart.remove(), 2000);
 
-      // Happy bounce animation
-      character.style.transform = 'scale(1.3)';
-      setTimeout(() => character.style.transform = 'scale(1)', 200);
+      // Happy bounce
+      character.style.transform = 'scale(1.35)';
+      setTimeout(() => character.style.transform = 'scale(1)', 250);
     }
 
     // Mouse support
@@ -100,7 +110,7 @@
       if (isFollowing) moveCharacter(e.clientX, e.clientY);
     });
 
-    // Touch support (mobile)
+    // Touch support
     document.addEventListener('touchmove', (e) => {
       if (isFollowing && e.touches.length > 0) {
         const touch = e.touches[0];
@@ -108,25 +118,22 @@
       }
     });
 
-    // Start following when mouse is pressed down
-    document.addEventListener('mousedown', () => isFollowing = true);
-    document.addEventListener('mouseup', () => isFollowing = false);
+    // Start / stop following
+    document.addEventListener('mousedown', () => { isFollowing = true; clearTimeout(wanderTimeout); });
+    document.addEventListener('mouseup', () => { isFollowing = false; wander(); });
 
-    // Touch start/end
-    document.addEventListener('touchstart', () => isFollowing = true);
-    document.addEventListener('touchend', () => isFollowing = false);
+    document.addEventListener('touchstart', () => { isFollowing = true; clearTimeout(wanderTimeout); });
+    document.addEventListener('touchend', () => { isFollowing = false; wander(); });
 
     // Click/tap to pet
     character.addEventListener('click', petReaction);
-    character.addEventListener('touchend', (e) => {
-      // Only pet if not dragging too much
-      petReaction(e);
-    });
+    character.addEventListener('touchend', petReaction);
 
-    // Initial position
+    // Start
     window.onload = () => {
       character.style.left = (window.innerWidth / 2 - 40) + 'px';
       character.style.top = (window.innerHeight / 2 - 40) + 'px';
+      wander();
     };
   </script>
 </body>
