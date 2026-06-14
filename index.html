@@ -5,8 +5,7 @@
     html, body { 
       height: 100%; width: 100%; margin: 0; padding: 0; 
       background: #2c3e50; font-family: sans-serif; 
-      overflow: hidden; 
-      touch-action: none;
+      overflow: hidden; touch-action: none;
     }
 
     #room {
@@ -23,19 +22,18 @@
     #character {
       position: absolute; width: 80px; height: 80px;
       background: linear-gradient(45deg, #ff4d4d, #00aaff);
-      color: white; font-weight: bold; font-size: 18px;
+      color: white; font-weight: bold; font-size: 24px;
       display: flex; align-items: center; justify-content: center;
       border: 4px solid white; border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
       transition: left 2s ease-in-out, top 2s ease-in-out, transform 0.2s;
       z-index: 100;
-      user-select: none;
       cursor: pointer;
     }
 
     #chat-container {
       position: fixed; bottom: 0; left: 0; right: 0;
-      height: 80px; background: rgba(0, 0, 0, 0.9);
+      height: 80px; background: rgba(0,0,0,0.9);
       border-top: 3px solid #ffd700; padding: 10px;
       display: flex; align-items: center; gap: 10px;
       z-index: 9999;
@@ -79,87 +77,96 @@
     const character = document.getElementById('character');
     let isFollowing = false;
     let wanderTimeout = null;
+    let apiKey = localStorage.getItem('openai_key') || '';
 
-    // Wandering behavior
     function wander() {
       if (isFollowing) return;
       const maxX = window.innerWidth - 100;
       const maxY = window.innerHeight * 0.55;
-      const newX = 50 + Math.random() * (maxX - 100);
-      const newY = 100 + Math.random() * (maxY - 150);
-      character.style.left = newX + 'px';
-      character.style.top = newY + 'px';
+      character.style.left = (50 + Math.random() * (maxX - 100)) + 'px';
+      character.style.top = (100 + Math.random() * (maxY - 150)) + 'px';
       wanderTimeout = setTimeout(wander, 2500 + Math.random() * 3500);
     }
 
     function moveCharacter(x, y) {
-      const targetX = x - 40;
-      const targetY = y - 40;
       character.style.transition = 'left 0.1s linear, top 0.1s linear';
-      character.style.left = targetX + 'px';
-      character.style.top = targetY + 'px';
+      character.style.left = (x - 40) + 'px';
+      character.style.top = (y - 40) + 'px';
     }
 
     function addMessage(text, isUser = false) {
-      const messagesDiv = document.getElementById('messages');
+      const div = document.getElementById('messages');
       const msg = document.createElement('div');
       msg.style.margin = '5px 0';
-      msg.innerHTML = isUser 
-        ? `<strong>You:</strong> ${text}` 
-        : `<strong>Pomni:</strong> ${text}`;
-      messagesDiv.appendChild(msg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      msg.innerHTML = isUser ? `<strong>You:</strong> ${text}` : `<strong>Pomni:</strong> ${text}`;
+      div.appendChild(msg);
+      div.scrollTop = div.scrollHeight;
     }
 
-    // Simple but natural local responses (no API needed)
-    const thoughtfulResponses = [
-      "I'm really scared... everything feels so wrong here.",
-      "You're the only person who talks to me like this.",
-      "Do you think we'll ever get out?",
-      "This place is so confusing... but you're nice.",
-      "I keep having weird dreams about the real world.",
-      "What do you think this place really is?",
-      "Thank you for staying with me.",
-      "I feel a little better when you talk to me."
-    ];
-
-    function sendMessage() {
+    async function sendMessage() {
       const input = document.getElementById('message-input');
       const text = input.value.trim();
-      if (!text) return;
+      if (!text || !apiKey) {
+        if (!apiKey) addMessage("Please enter your OpenAI key first (top of the page).");
+        return;
+      }
 
       addMessage(text, true);
       input.value = '';
+      const thinking = document.createElement('div');
+      thinking.textContent = "Pomni is thinking...";
+      document.getElementById('messages').appendChild(thinking);
 
-      // Natural reply
-      setTimeout(() => {
-        const reply = thoughtfulResponses[Math.floor(Math.random() * thoughtfulResponses.length)];
-        addMessage(reply);
-      }, 700);
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: "You are Pomni, a scared, emotional girl trapped in a weird digital circus world. Speak naturally like a real person. Keep replies short (1-2 sentences)." },
+              { role: "user", content: text }
+            ],
+            max_tokens: 120
+          })
+        });
+
+        const data = await res.json();
+        thinking.remove();
+        addMessage(data.choices[0].message.content);
+      } catch (err) {
+        thinking.remove();
+        addMessage("...I can't reach the outside world right now.");
+      }
     }
 
-    // Mouse / Touch following
-    document.addEventListener('mousemove', (e) => { if (isFollowing) moveCharacter(e.clientX, e.clientY); });
-    document.addEventListener('touchmove', (e) => { 
-      if (isFollowing && e.touches.length > 0) moveCharacter(e.touches[0].clientX, e.touches[0].clientY); 
-    });
+    // Following controls
+    document.addEventListener('mousemove', e => { if (isFollowing) moveCharacter(e.clientX, e.clientY); });
+    document.addEventListener('touchmove', e => { if (isFollowing && e.touches.length) moveCharacter(e.touches[0].clientX, e.touches[0].clientY); });
 
     document.addEventListener('mousedown', () => { isFollowing = true; clearTimeout(wanderTimeout); });
     document.addEventListener('mouseup', () => { isFollowing = false; wander(); });
     document.addEventListener('touchstart', () => { isFollowing = true; clearTimeout(wanderTimeout); });
     document.addEventListener('touchend', () => { isFollowing = false; wander(); });
 
-    document.getElementById('send-btn').addEventListener('click', sendMessage);
-    document.getElementById('message-input').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
+    document.getElementById('send-btn').onclick = sendMessage;
+    document.getElementById('message-input').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
     // Start
     window.onload = () => {
       character.style.left = (window.innerWidth / 2 - 40) + 'px';
       character.style.top = (window.innerHeight / 2 - 40) + 'px';
       wander();
-      addMessage("Hi... can you really see me?");
+      addMessage("...Hello? Is someone really there?");
+      
+      // Show key input if needed
+      if (!apiKey) {
+        const key = prompt("Enter your OpenAI API key (sk-...):");
+        if (key) {
+          apiKey = key;
+          localStorage.setItem('openai_key', key);
+        }
+      }
     };
   </script>
 </body>
