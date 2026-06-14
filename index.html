@@ -54,10 +54,16 @@
 
     #messages {
       position: fixed; bottom: 90px; left: 15px; right: 15px;
-      height: 140px; background: rgba(0,0,0,0.7);
+      height: 160px; background: rgba(0,0,0,0.75);
       border: 2px solid #ffd700; border-radius: 8px;
-      padding: 8px; overflow-y: auto; color: #ffd700;
+      padding: 10px; overflow-y: auto; color: #ffd700;
       font-size: 14px; z-index: 9998;
+    }
+
+    #api-key-input {
+      position: fixed; top: 10px; left: 10px; z-index: 10000;
+      background: rgba(0,0,0,0.8); padding: 8px; border-radius: 6px;
+      color: white; display: none;
     }
   </style>
 </head>
@@ -65,38 +71,39 @@
 
   <div id="room">
     <div class="floor"></div>
-    <div id="character">❤️</div>
+    <div id="character">🌹</div>
   </div>
 
   <div id="messages"></div>
 
   <div id="chat-container">
-    <input type="text" id="message-input" placeholder="Type a message to the character...">
+    <input type="text" id="message-input" placeholder="Talk to the character...">
     <button id="send-btn">Send</button>
+  </div>
+
+  <div id="api-key-input">
+    OpenAI Key: <input type="password" id="key-input" placeholder="sk-..." size="40">
+    <button onclick="saveKey()">Save</button>
   </div>
 
   <script>
     const character = document.getElementById('character');
     let isFollowing = false;
     let wanderTimeout = null;
+    let apiKey = '';
 
     // Wandering behavior
     function wander() {
       if (isFollowing) return;
-
       const maxX = window.innerWidth - 100;
       const maxY = window.innerHeight * 0.55;
-
       const newX = 50 + Math.random() * (maxX - 100);
       const newY = 100 + Math.random() * (maxY - 150);
-
       character.style.left = newX + 'px';
       character.style.top = newY + 'px';
-
       wanderTimeout = setTimeout(wander, 2500 + Math.random() * 3500);
     }
 
-    // Follow finger/mouse
     function moveCharacter(x, y) {
       const targetX = x - 40;
       const targetY = y - 40;
@@ -108,43 +115,61 @@
     function addMessage(text, isUser = false) {
       const messagesDiv = document.getElementById('messages');
       const msg = document.createElement('div');
-      msg.style.margin = '4px 0';
+      msg.style.margin = '5px 0';
       msg.innerHTML = isUser 
         ? `<strong>You:</strong> ${text}` 
-        : `<strong>Character:</strong> ${text}`;
+        : `<strong>Pomni:</strong> ${text}`;
       messagesDiv.appendChild(msg);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    // For now: simple echo (we can add real AI later if you want)
-    function sendMessage() {
+    async function sendMessage() {
       const input = document.getElementById('message-input');
       const text = input.value.trim();
-      if (!text) return;
+      if (!text || !apiKey) return;
 
       addMessage(text, true);
       input.value = '';
 
-      // Placeholder reply - tell me if you want real OpenAI integration
-      setTimeout(() => {
-        addMessage("...");  // Empty for now
-      }, 600);
+      addMessage("thinking...");
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: "You are Pomni, a scared but kind girl trapped in a strange digital circus world. Respond naturally, emotionally, and in character. Keep replies short." },
+              { role: "user", content: text }
+            ],
+            max_tokens: 150
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.choices[0].message.content;
+        
+        // Remove "thinking..."
+        document.getElementById('messages').lastChild.remove();
+        addMessage(reply);
+      } catch (e) {
+        document.getElementById('messages').lastChild.remove();
+        addMessage("...I can't connect right now.");
+      }
     }
 
-    // Mouse / Touch controls
-    document.addEventListener('mousemove', (e) => {
-      if (isFollowing) moveCharacter(e.clientX, e.clientY);
-    });
-
-    document.addEventListener('touchmove', (e) => {
-      if (isFollowing && e.touches.length > 0) {
-        moveCharacter(e.touches[0].clientX, e.touches[0].clientY);
-      }
+    // Mouse / Touch following
+    document.addEventListener('mousemove', (e) => { if (isFollowing) moveCharacter(e.clientX, e.clientY); });
+    document.addEventListener('touchmove', (e) => { 
+      if (isFollowing && e.touches.length > 0) moveCharacter(e.touches[0].clientX, e.touches[0].clientY); 
     });
 
     document.addEventListener('mousedown', () => { isFollowing = true; clearTimeout(wanderTimeout); });
     document.addEventListener('mouseup', () => { isFollowing = false; wander(); });
-
     document.addEventListener('touchstart', () => { isFollowing = true; clearTimeout(wanderTimeout); });
     document.addEventListener('touchend', () => { isFollowing = false; wander(); });
 
@@ -153,12 +178,20 @@
       if (e.key === 'Enter') sendMessage();
     });
 
+    function saveKey() {
+      apiKey = document.getElementById('key-input').value.trim();
+      if (apiKey) {
+        document.getElementById('api-key-input').style.display = 'none';
+        addMessage("Connected! Talk to me...");
+      }
+    }
+
     // Start
     window.onload = () => {
       character.style.left = (window.innerWidth / 2 - 40) + 'px';
       character.style.top = (window.innerHeight / 2 - 40) + 'px';
       wander();
-      addMessage("...");
+      document.getElementById('api-key-input').style.display = 'block';
     };
   </script>
 </body>
